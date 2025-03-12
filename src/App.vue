@@ -1,19 +1,12 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
+import Login from './components/Login.vue'
 </script>
 
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-    </div>
-  </header>
+  <header></header>
 
   <main>
-    <TheWelcome />
+    <Login />
   </main>
 </template>
 
@@ -26,6 +19,16 @@ header {
   display: block;
   margin: 0 auto 2rem;
 }
+
+/* ✅ Centers the <Login> component */
+  main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh; /* Ensures it takes full screen height */
+  width: 100%; /* Makes sure it's full width */
+}
+
 
 @media (min-width: 1024px) {
   header {
