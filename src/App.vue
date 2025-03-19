@@ -1,12 +1,13 @@
 <script setup>
 import Login from './components/Login.vue'
+import Register from "./components/Register.vue"
 </script>
 
 <template>
   <header></header>
 
   <main>
-    <Login />
+    <Register/>
   </main>
 </template>
 

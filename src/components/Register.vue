@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from "vue";
 import app from "../api/firebase"
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 
 // Form values
 const username = ref("");
@@ -19,20 +19,25 @@ const validateForm = (event) => {
 
 function login(){
 const auth = getAuth(app);
-signInWithEmailAndPassword(auth, username.value, password.value)
+createUserWithEmailAndPassword(auth, username.value, password.value)
   .then((userCredential) => {
     // Signed in 
     const user = userCredential.user;
-    //this.$router.push({path:"/Secure"})
     // ...
   })
   .catch((error) => {
     const errorCode = error.code;
     const errorMessage = error.message;
-    console.log(errorCode, errorMessage)
+    //console.log(errorCode, errorMessage)
     switch(errorCode){
-      case "auth/invalid-credential":
-        console.log("user not found")
+      case "auth/invalid-email":
+        console.log("please enter a valid email address")
+        break;
+      case "auth/weak-password":
+        console.log("please enter a stronger password")
+        break;
+      case "auth/email-already-in-use":
+        console.log("user already exists")
         break;
     }
   });
@@ -42,12 +47,12 @@ signInWithEmailAndPassword(auth, username.value, password.value)
 <template>
   <div id="authBox">
     <img src="@/assets/logo.svg" alt="Logo" class="logo">
-    <h2>Login</h2>
+    <h2>Register</h2>
 
     <form @submit="validateForm">
       <input type="text" class="input-field" v-model="username" placeholder="Username">
       <input type="password" class="input-field" v-model="password" placeholder="Password">
-      <button type="button" class="auth-button" @click="validateForm">Login</button>
+      <button type="button" class="auth-button" @click="validateForm">Register</button>
     </form>
 
     <p v-if="error" class="error-message">Both fields are required.</p>
