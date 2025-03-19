@@ -1,5 +1,7 @@
 <script setup>
 import { ref } from "vue";
+import app from "../api/firebase"
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 
 // Form values
 const username = ref("");
@@ -9,8 +11,33 @@ const error = ref(false);
 // Validation function
 const validateForm = (event) => {
   error.value = !username.value.trim() || !password.value.trim();
-  if (error.value) event.preventDefault(); // Prevent form submission
+  if (error.value) event.preventDefault();
+  else{
+    login()
+  }
 };
+
+function login(){
+const auth = getAuth(app);
+console.log(username,password)
+createUserWithEmailAndPassword(auth, username.value, password.value)
+  .then((userCredential) => {
+    // Signed in 
+    const user = userCredential.user;
+    console.log(user)
+    // ...
+  })
+  .catch((error) => {
+    const errorCode = error.code;
+    const errorMessage = error.message;
+    console.log(errorCode, errorMessage)
+    switch(errorCode){
+      case "auth/invalid-email":
+        console.log("please enter a valid email address")
+        break;
+    }
+  });
+}
 </script>
 
 <template>
@@ -21,7 +48,7 @@ const validateForm = (event) => {
     <form @submit="validateForm">
       <input type="text" class="input-field" v-model="username" placeholder="Username">
       <input type="password" class="input-field" v-model="password" placeholder="Password">
-      <button type="submit" class="auth-button">Login</button>
+      <button type="button" class="auth-button" @click="validateForm">Login</button>
     </form>
 
     <p v-if="error" class="error-message">Both fields are required.</p>
