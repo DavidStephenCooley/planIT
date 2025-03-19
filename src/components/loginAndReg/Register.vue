@@ -1,23 +1,23 @@
 <script setup>
 import { ref } from "vue";
-import app from "../api/firebase"
+import app from "../../api/firebase"
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import handleError from "./errorHandling";
 
 // Form values
 const username = ref("");
 const password = ref("");
-const error = ref(false);
+let error = ref("");
 
 // Validation function
 const validateForm = (event) => {
-  error.value = !username.value.trim() || !password.value.trim();
-  if (error.value) event.preventDefault();
-  else{
-    login()
+  if (!username.value.length || !password.value.length){
+    event.preventDefault();
   }
+  register()
 };
 
-function login(){
+function register(){
 const auth = getAuth(app);
 createUserWithEmailAndPassword(auth, username.value, password.value)
   .then((userCredential) => {
@@ -25,20 +25,10 @@ createUserWithEmailAndPassword(auth, username.value, password.value)
     const user = userCredential.user;
     // ...
   })
-  .catch((error) => {
-    const errorCode = error.code;
-    const errorMessage = error.message;
-    //console.log(errorCode, errorMessage)
-    switch(errorCode){
-      case "auth/invalid-email":
-        console.log("please enter a valid email address")
-        break;
-      case "auth/weak-password":
-        console.log("please enter a stronger password")
-        break;
-      case "auth/email-already-in-use":
-        console.log("user already exists")
-        break;
+  .catch((e) => {
+    error.value = handleError(e)
+    if (!username.value.length || !password.value.length){
+      error.value = "please enter both fields"
     }
   });
 }
@@ -47,15 +37,14 @@ createUserWithEmailAndPassword(auth, username.value, password.value)
 <template>
   <div id="authBox">
     <img src="@/assets/logo.svg" alt="Logo" class="logo">
-    <h2>Register</h2>
+    <h2>Registration</h2>
 
     <form @submit="validateForm">
       <input type="text" class="input-field" v-model="username" placeholder="Username">
       <input type="password" class="input-field" v-model="password" placeholder="Password">
+      <p v-if="error!=''" class="error-message" :key="error">{{ error }}</p>
       <button type="button" class="auth-button" @click="validateForm">Register</button>
     </form>
-
-    <p v-if="error" class="error-message">Both fields are required.</p>
 
     <div class="separator-container">
       <div class="separator-line"></div>

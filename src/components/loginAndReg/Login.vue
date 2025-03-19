@@ -1,20 +1,20 @@
 <script setup>
 import { ref } from "vue";
-import app from "../api/firebase"
+import app from "../../api/firebase"
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import handleError from "./errorHandling";
 
 // Form values
 const username = ref("");
 const password = ref("");
-const error = ref(false);
+const error = ref("");
 
 // Validation function
 const validateForm = (event) => {
-  error.value = !username.value.trim() || !password.value.trim();
-  if (error.value) event.preventDefault();
-  else{
-    login()
+  if (!username.value.length || !password.value.length){
+    event.preventDefault();
   }
+  login()
 };
 
 function login(){
@@ -26,14 +26,10 @@ signInWithEmailAndPassword(auth, username.value, password.value)
     //this.$router.push({path:"/Secure"})
     // ...
   })
-  .catch((error) => {
-    const errorCode = error.code;
-    const errorMessage = error.message;
-    console.log(errorCode, errorMessage)
-    switch(errorCode){
-      case "auth/invalid-credential":
-        console.log("user not found")
-        break;
+  .catch((e) => {
+    error.value = handleError(e)
+    if (!username.value.length || !password.value.length){
+      error.value = "please enter both fields"
     }
   });
 }
@@ -47,10 +43,9 @@ signInWithEmailAndPassword(auth, username.value, password.value)
     <form @submit="validateForm">
       <input type="text" class="input-field" v-model="username" placeholder="Username">
       <input type="password" class="input-field" v-model="password" placeholder="Password">
+      <p v-if="error!=null" class="error-message" :key="error">{{ error }}</p>
       <button type="button" class="auth-button" @click="validateForm">Login</button>
     </form>
-
-    <p v-if="error" class="error-message">Both fields are required.</p>
 
     <div class="separator-container">
       <div class="separator-line"></div>
