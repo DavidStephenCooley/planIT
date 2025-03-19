@@ -30,10 +30,16 @@ createUserWithEmailAndPassword(auth, username.value, password.value)
   .catch((error) => {
     const errorCode = error.code;
     const errorMessage = error.message;
-    console.log(errorCode, errorMessage)
+    //console.log(errorCode, errorMessage)
     switch(errorCode){
       case "auth/invalid-email":
         console.log("please enter a valid email address")
+        break;
+      case "auth/weak-password":
+        console.log("please enter a stronger password")
+        break;
+      case "auth/email-already-in-use":
+        console.log("user already exists")
         break;
     }
   });
