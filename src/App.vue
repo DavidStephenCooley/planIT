@@ -4,6 +4,11 @@ import TheWelcome from './components/TheWelcome.vue'
 </script>
 
 <template>
+  <router-view></router-view>
+  
+<!--in your vue pages, use: <router-link to="/pageName"></router-link> -->
+
+<!--
   <header>
     <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
 
@@ -15,6 +20,7 @@ import TheWelcome from './components/TheWelcome.vue'
   <main>
     <TheWelcome />
   </main>
+-->
 </template>
 
 <style scoped>
