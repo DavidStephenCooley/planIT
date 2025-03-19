@@ -22,7 +22,7 @@ const auth = getAuth(app);
 signInWithEmailAndPassword(auth, username.value, password.value)
   .then((userCredential) => {
     // Signed in 
-    const user = userCredential.user;
+    user = userCredential.user;
     //this.$router.push({path:"/Secure"})
     // ...
   })
@@ -36,6 +36,7 @@ signInWithEmailAndPassword(auth, username.value, password.value)
 </script>
 
 <template>
+
   <div id="authBox">
     <img src="@/assets/logo.svg" alt="Logo" class="logo">
     <h2>Login</h2>

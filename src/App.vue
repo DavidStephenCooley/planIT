@@ -7,7 +7,7 @@ import Register from "./components/loginAndReg/Register.vue"
   <header></header>
 
   <main>
-    <Register/>
+    <Login/>
   </main>
 </template>
 

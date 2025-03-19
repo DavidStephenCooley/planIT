@@ -15,8 +15,11 @@ export default function (e){
       case "auth/email-already-in-use":
         error="user already exists"
         break;
+      case "auth/invalid-credential":
+        error="username or password incorrect"
+        break;
       default:
-        error = null
+        error=null
     }
     return error
 }
