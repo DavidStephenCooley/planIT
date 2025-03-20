@@ -6,10 +6,11 @@ import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 
 let username = ref("")
 let profilePic = ref("")
-let loggedIn = false
 
+/*
 const auth = getAuth(app)
 signInWithEmailAndPassword(auth, "hi@gmail.com", "123456")
+*/
 
 async function load(){
     const functions = getFunctions(app);
@@ -17,10 +18,14 @@ async function load(){
 
     await secureFunction().then((result) => {
         console.log(result); 
+
+        if(result.data){
         let user = getAuth(app).currentUser
         console.log(user)
+        
         username.value = user.displayName
         profilePic.value = user.photoURL
+        }
     });
 }
 
@@ -35,6 +40,8 @@ onMounted(()=>{
     <p>secure page</p>
     <p>Logged in as {{ username }}</p>
     <img v-bind:src="profilePic">
+    <router-link to="/Login">Login</router-link>
+    <router-link to="/Register">Register</router-link>
 
 </template>
 

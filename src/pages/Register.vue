@@ -1,14 +1,17 @@
 <script setup>
 import { ref } from "vue";
-import app from "../../api/firebase"
+import app from "../api/firebase"
+import { useRouter } from 'vue-router'
 import { getAuth, createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import handleError from "./errorHandling";
+import handleError from "./loginAndReg/errorHandling";
 
 // Form values
 const username = ref("");
 const email = ref("")
 const password = ref("");
 let error = ref("");
+const router = useRouter()
+
 
 // Validation function
 const validateForm = (event) => {
@@ -25,6 +28,7 @@ function register(){
       // Signed in 
       const user = userCredential.user;
       updateProfile(user, {displayName: username.value, photoURL: "https://cdn.usdairy.com/optimize/getmedia/b5108b6f-59c3-4cc4-b1d5-4b9b0d1e0c54/swiss.jpg.jpg.aspx?format=webp"})
+      router.push({path:"/secure"})
       // ...
     })
     .catch((e) => {
@@ -54,6 +58,8 @@ function register(){
       <span class="or-text">OR</span>
       <div class="separator-line"></div>
     </div>
+
+    <routerLink to="/Login">Login Page</routerLink>
 
     <a href="google-login.html" class="auth-link google-login">Sign Up with Google</a>
     <a href="signup.html" class="auth-link">Sign Up with Email</a>

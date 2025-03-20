@@ -20,8 +20,8 @@ exports.helloWorld = onRequest((request, response) => {
 
 exports.secureFunction = onCall({cors:true}, async (request)=>{
     if(request.auth === undefined){
-      return "user not logged in"
+      return false
     }else{
-      return "user logged in"
+      return true
     }
 })
