@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from "vue";
 import app from "../../api/firebase"
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import handleError from "./errorHandling";
 
 // Form values
@@ -24,7 +24,7 @@ function register(){
     .then((userCredential) => {
       // Signed in 
       const user = userCredential.user;
-      user.displayName = username
+      updateProfile(user, {displayName: username.value, photoURL: "https://cdn.usdairy.com/optimize/getmedia/b5108b6f-59c3-4cc4-b1d5-4b9b0d1e0c54/swiss.jpg.jpg.aspx?format=webp"})
       // ...
     })
     .catch((e) => {

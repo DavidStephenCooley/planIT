@@ -1,7 +1,7 @@
 export default function (e){
     const errorCode = e.code;
     let error = null;
-    console.log(errorCode)
+    console.log(e)
     switch(errorCode){
       case "auth/invalid-email":
         error="please enter a valid email address"

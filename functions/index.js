@@ -18,7 +18,7 @@ exports.helloWorld = onRequest((request, response) => {
   response.send("Hello from Firebase!");
 });
 
-exports.secureFunction = onCall(async (request)=>{
+exports.secureFunction = onCall({cors:true}, async (request)=>{
     if(request.auth === undefined){
       return "user not logged in"
     }else{
