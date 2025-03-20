@@ -6,6 +6,7 @@ import handleError from "./errorHandling";
 
 // Form values
 const username = ref("");
+const email = ref("")
 const password = ref("");
 let error = ref("");
 
@@ -18,19 +19,20 @@ const validateForm = (event) => {
 };
 
 function register(){
-const auth = getAuth(app);
-createUserWithEmailAndPassword(auth, username.value, password.value)
-  .then((userCredential) => {
-    // Signed in 
-    const user = userCredential.user;
-    // ...
-  })
-  .catch((e) => {
-    error.value = handleError(e)
-    if (!username.value.length || !password.value.length){
-      error.value = "please enter both fields"
-    }
-  });
+  const auth = getAuth(app);
+  createUserWithEmailAndPassword(auth, email.value, password.value)
+    .then((userCredential) => {
+      // Signed in 
+      const user = userCredential.user;
+      user.displayName = username
+      // ...
+    })
+    .catch((e) => {
+      error.value = handleError(e)
+      if (!username.value.length || !password.value.length || !email.value.length){
+        error.value = "please enter all fields"
+      }
+    });
 }
 </script>
 
@@ -41,6 +43,7 @@ createUserWithEmailAndPassword(auth, username.value, password.value)
 
     <form @submit="validateForm">
       <input type="text" class="input-field" v-model="username" placeholder="Username">
+      <input type="text" class="input-field" v-model="email" placeholder="Email">
       <input type="password" class="input-field" v-model="password" placeholder="Password">
       <p v-if="error!=''" class="error-message" :key="error">{{ error }}</p>
       <button type="button" class="auth-button" @click="validateForm">Register</button>

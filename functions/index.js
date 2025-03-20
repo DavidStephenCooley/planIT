@@ -18,7 +18,10 @@ exports.helloWorld = onRequest((request, response) => {
   response.send("Hello from Firebase!");
 });
 
-exports.getUserData = onCall(async (request)=>{
-  console.log(request.auth)
-    return request.auth
+exports.secureFunction = onCall(async (request)=>{
+    if(request.auth === undefined){
+      return "user not logged in"
+    }else{
+      return "user logged in"
+    }
 })

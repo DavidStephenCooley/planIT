@@ -18,20 +18,21 @@ const validateForm = (event) => {
 };
 
 function login(){
-const auth = getAuth(app);
-signInWithEmailAndPassword(auth, username.value, password.value)
-  .then((userCredential) => {
-    // Signed in 
-    user = userCredential.user;
-    //this.$router.push({path:"/Secure"})
-    // ...
-  })
-  .catch((e) => {
-    error.value = handleError(e)
-    if (!username.value.length || !password.value.length){
-      error.value = "please enter both fields"
-    }
-  });
+  const auth = getAuth(app);
+  signInWithEmailAndPassword(auth, username.value, password.value)
+    .then((userCredential) => {
+      // Signed in 
+      const user = userCredential.user;
+      //this.$router.push({path:"/Secure"})
+      // ...
+    })
+    .catch((e) => {
+      console.log(e)
+      error.value = handleError(e)
+      if (!username.value.length || !password.value.length){
+        error.value = "please enter both fields"
+      }
+    });
 }
 </script>
 
