@@ -1,37 +1,54 @@
 <script setup>
-import { toDisplayString } from 'vue';
-
-import { ref, computed } from 'vue';
+import { ref } from 'vue';
 
 const today = new Date();
 const currentMonth = ref(today.getMonth());
 const currentYear = ref(today.getFullYear());
 
-const getCalendar = (year, month) => {
-  let firstDay = new Date(year, month, 1).getDay(); // Get first day (0=Sunday)
-  firstDay = firstDay === 0 ? 6 : firstDay - 1; // Adjust to start week on Monday
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
+// Get number of days in a month
+function getDaysInMonth(year, month) {
+  return new Date(year, month + 1, 0).getDate();
+}
 
-  let weeks = [];
-  let week = new Array(7).fill(null); // Empty week
+// Get the first weekday (0=Monday, 6=Sunday)
+function getFirstDay(year, month) {
+  let day = new Date(year, month, 1).getDay();
+  return day === 0 ? 6 : day - 1; // Adjust to start on Monday
+}
 
-  let dayCounter = 1;
-  for (let i = 0; i < 6; i++) { // Max 6 rows
-    for (let j = 0; j < 7; j++) {
-      if (i === 0 && j < firstDay) continue; // Skip empty days before first date
-      if (dayCounter > daysInMonth) break; // Stop if month is filled
-      week[j] = dayCounter;
-      dayCounter++;
+// Build calendar grid manually
+function generateCalendar() {
+  let days = getDaysInMonth(currentYear.value, currentMonth.value);
+  let firstDay = getFirstDay(currentYear.value, currentMonth.value);
+  let grid = [];
+
+  let count = 1;
+  for (let row = 0; row < 6; row++) {
+    let week = [];
+    for (let col = 0; col < 7; col++) {
+      if (row === 0 && col < firstDay) {
+        week.push(""); // Empty space before month starts
+      } else if (count > days) {
+        week.push(""); // Empty space after month ends
+      } else {
+        week.push(count); // Add actual day
+        count++;
+      }
     }
-    weeks.push([...week]); // Push a copy of the week
-    week.fill(null); // Reset week
-    if (dayCounter > daysInMonth) break;
+    grid.push(week);
   }
+  return grid;
+}
 
-  return weeks;
-};
+const calendar = ref(generateCalendar());
 
-const calendar = computed(() => getCalendar(currentYear.value, currentMonth.value));
+function isToday(day) {
+  return (
+    day === today.getDate() &&
+    currentMonth.value === today.getMonth() &&
+    currentYear.value === today.getFullYear()
+  );
+}
 </script>
 
 <template>
@@ -40,8 +57,8 @@ const calendar = computed(() => getCalendar(currentYear.value, currentMonth.valu
     <div id="headerBox" class="box">
       <table id="headerCalander" class="box">
         <thead>
-          <tr id="days">
-            <th v-for="day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']" :key="day"> {{ day }}</th>
+          <tr>
+            <th>Mon</th> <th>Tue</th> <th>Wed</th> <th>Thu</th> <th>Fri</th> <th>Sat</th> <th>Sun</th>
           </tr>
         </thead>
       </table>
@@ -49,18 +66,13 @@ const calendar = computed(() => getCalendar(currentYear.value, currentMonth.valu
     <div id="calenderBox" class="box">
       <table id="monthVue">
         <tbody>
-          <tr v-for="(week, rowIndex) in calendar" :key="rowIndex">
-            <td v-for="(day, colIndex) in week" :key="colIndex"
-            :class="[
-              day === today.getDate() ? 'curr' : '',
-              colIndex >= 5 ? 'weekend' : 'weekday'
-            ]">
-            {{ day || '' }}</td>
+          <tr v-for="week in calendar">
+            <td v-for="day in week" :class="{ today: isToday(day) }">{{ day }}</td>
           </tr>
         </tbody>
       </table>
     </div>
-  </div>
+    </div>
   <div id="taskViewButton" class="sidebutton">
     <span class="material-symbols-outlined">arrow_forward_ios</span>
   </div>
@@ -190,6 +202,11 @@ main {
   align-items: center;
   min-height: 100vh; /* Ensures it takes full screen height */
   width: 100%; /* Makes sure it's full width */
+}
+
+.today {
+  background-color: rgb(50, 50, 50);
+  color: white;
 }
 
 
