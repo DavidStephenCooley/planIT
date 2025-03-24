@@ -3,7 +3,7 @@ import { ref } from "vue";
 import app from "../api/firebase";
 import { useRouter } from 'vue-router';
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-import handleError from "./loginAndReg/errorHandling";
+import handleError from "./loginAndReg/errorHandler";
 
 // Form values
 const username = ref("");
@@ -23,8 +23,8 @@ const validateForm = (event) => {
 
 function login(){
   const auth = getAuth(app);
-  signInWithEmailAndPassword(auth, username.value, password.value)
-    .then((userCredential) => {
+  signInWithEmailAndPassword(auth, username.value, password.value) // Checks if user(auth) exists with 'username', then checks if 'password' is correct
+    .then((userCredential) => { 
       // Signed in 
       const user = userCredential.user;
       
@@ -35,7 +35,7 @@ function login(){
       console.log(e)
       error.value = handleError(e)
       if (!username.value.length || !password.value.length){
-        error.value = "please enter both fields"
+        error.value = "Please enter both fields!"
       }
     });
 }
@@ -60,10 +60,8 @@ function login(){
       <div class="separator-line"></div>
     </div>
 
-    <routerLink to="/Register">Registration Page</routerLink>
-
-    <a href="google-login.html" class="auth-link google-login">Sign Up with Google</a>
-    <a href="signup.html" class="auth-link">Sign Up with Email</a>
+    <button class="auth-link google-login">Sign Up with Google</button>
+    <button class="auth-link" @click="router.push('/register')">Sign Up with Email</button>
   </div>
 </template>
 

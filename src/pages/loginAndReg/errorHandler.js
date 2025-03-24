@@ -4,19 +4,19 @@ export default function (e){
     console.log(e)
     switch(errorCode){
       case "auth/invalid-email":
-        error="please enter a valid email address"
+        error="Please enter a valid email address!"
         break;
       case "auth/missing-password":
-        error="please enter a password"
+        error="Please enter a password!"
         break;
       case "auth/weak-password":
-        error="please enter a stronger password"
+        error="Please enter a stronger password!"
         break;
       case "auth/email-already-in-use":
-        error="user already exists"
+        error="User already exists!"
         break;
       case "auth/invalid-credential":
-        error="username or password incorrect"
+        error="Username or password is incorrect!"
         break;
       default:
         error=null
