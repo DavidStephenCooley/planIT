@@ -1,22 +1,53 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 
 const today = new Date();
 const currentMonth = ref(today.getMonth());
 const currentYear = ref(today.getFullYear());
+const monthLabel = ref("MONTH");
+const calendar = ref([]);
 
-// Get number of days in a month
+const months = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", 
+               "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
+
+// Update month label and calendar whenever month/year changes
+watch([currentMonth, currentYear], () => {
+  updateMonthLabel();
+  updateCalendar();
+});
+
+function updateMonthLabel() {
+  monthLabel.value = months[currentMonth.value];
+}
+
+function updateCalendar() {
+  calendar.value = generateCalendar();
+}
+
+function prevMonth() {
+  currentMonth.value = currentMonth.value === 0 ? 11 : currentMonth.value - 1;
+  if (currentMonth.value === 11) currentYear.value--;
+}
+
+function nextMonth() {
+  currentMonth.value = currentMonth.value === 11 ? 0 : currentMonth.value + 1;
+  if (currentMonth.value === 0) currentYear.value++;
+}
+
+onMounted(() => {
+  updateMonthLabel();
+  updateCalendar();
+});
+
 function getDaysInMonth(year, month) {
   return new Date(year, month + 1, 0).getDate();
 }
 
-// Get the first weekday (0=Monday, 6=Sunday)
 function getFirstDay(year, month) {
   let day = new Date(year, month, 1).getDay();
-  return day === 0 ? 6 : day - 1; // Adjust to start on Monday
+  return day === 0 ? 6 : day - 1;
 }
 
-// Build calendar grid manually
 function generateCalendar() {
   let days = getDaysInMonth(currentYear.value, currentMonth.value);
   let firstDay = getFirstDay(currentYear.value, currentMonth.value);
@@ -27,11 +58,11 @@ function generateCalendar() {
     let week = [];
     for (let col = 0; col < 7; col++) {
       if (row === 0 && col < firstDay) {
-        week.push(""); // Empty space before month starts
+        week.push("");
       } else if (count > days) {
-        week.push(""); // Empty space after month ends
+        week.push("");
       } else {
-        week.push(count); // Add actual day
+        week.push(count);
         count++;
       }
     }
@@ -39,8 +70,6 @@ function generateCalendar() {
   }
   return grid;
 }
-
-const calendar = ref(generateCalendar());
 
 function isToday(day) {
   return (
@@ -52,34 +81,41 @@ function isToday(day) {
 </script>
 
 <template>
-<main>
-  <div id="surroundBox" class="box">
-    <div id="headerBox" class="box">
-      <table id="headerCalander" class="box">
-        <thead>
-          <tr>
-            <th>Mon</th> <th>Tue</th> <th>Wed</th> <th>Thu</th> <th>Fri</th> <th>Sat</th> <th>Sun</th>
-          </tr>
-        </thead>
-      </table>
+  <main>
+    <div id="monthHeader" class="box">
+      <span class="material-symbols-outlined chevron" @click="prevMonth">chevron_left</span>
+      <span class="month-label">{{ monthLabel }} {{ currentYear }}</span>
+      <span class="material-symbols-outlined chevron" @click="nextMonth">chevron_right</span>
     </div>
-    <div id="calenderBox" class="box">
-      <table id="monthVue">
-        <tbody>
-          <tr v-for="week in calendar">
-            <td v-for="day in week" :class="{ today: isToday(day) }">{{ day }}</td>
-          </tr>
-        </tbody>
-      </table>
+    <div id="surroundBox" class="box">
+      <div id="headerBox" class="box">
+        <table id="headerCalander" class="box">
+          <thead>
+            <tr>
+              <th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th>
+            </tr>
+          </thead>
+        </table>
+      </div>
+      <div id="calenderBox" class="box">
+        <table id="monthVue">
+          <tbody>
+            <tr v-for="(week, weekIndex) in calendar" :key="weekIndex">
+              <td v-for="(day, dayIndex) in week" :key="dayIndex" :class="{ today: isToday(day) }">
+                {{ day }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
+    <div id="taskViewButton" class="sidebutton">
+      <span class="material-symbols-outlined">arrow_forward_ios</span>
     </div>
-  <div id="taskViewButton" class="sidebutton">
-    <span class="material-symbols-outlined">arrow_forward_ios</span>
-  </div>
-  <div id="newTaskButton" class="sidebutton">
-    <span class="material-symbols-outlined" id="add">add</span>
-  </div>
-</main>
+    <div id="newTaskButton" class="sidebutton">
+      <span class="material-symbols-outlined" id="add">add</span>
+    </div>
+  </main>
 </template>
 
 <style scoped>
@@ -88,69 +124,81 @@ html {
   overflow: hidden;
 }
 
-header {
-  line-height: 1.5;
-}
-
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-@media (min-width: 1024px) {
-
 .box {
   position: absolute;
 }
 
+#monthHeader {
+  left: calc(50% - 30vw + 2vw);
+  top: 8vh;
+  background-color: rgb(66,66,66);
+  width: 15vw;
+  height: 5vh;
+  border-top-left-radius: 1vw; border-top-right-radius: 1vw;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1vw;
+}
+
+.month-label {
+  flex-grow: 1;
+  text-align: center;
+}
+
+.chevron {
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.chevron:hover {
+  color: #ccc;
+}
+
 #surroundBox {
-  height: 45rem;
-  width: 60rem;
+  height:75vh;
+  width: 60vw;
   background-color: rgb(66, 66, 66);
-  border-radius: 1rem;
+  border-radius: 1vw;
+  margin: 0 auto;
 }
 
 #headerBox {
-  height: 6rem;
-  width: 60rem;
+  height: 7vh;
+  width: 60vw;
   background-color: rgb(50, 50, 50);
-  border-top-left-radius: 1rem; border-top-right-radius: 1rem;
+  border-top-left-radius: 1vw;
+  border-top-right-radius: 1vw;
 }
 
 #calenderBox {
-  height: calc(45rem - 6rem);
-  width: 60rem;
+  height: calc(75vh - 6vh);
+  width: 60vw;
   background-color: rgb(66, 66, 66);
-  top: 6rem;
-  border-bottom-right-radius: 1rem;
-  border-bottom-left-radius: 1rem;
+  top: 10vh;
+  border-bottom-right-radius: 1vw;
+  border-bottom-left-radius: 1vw;
 }
 
 #headerCalander {
-  width: 60rem;
-  top: 2rem;
+  width: 60vw;
+  top: 1vh;
   table-layout: fixed;
   font-size: 1.5rem;
-}
-#days {
-  background-color: rgb(50, 50, 50);
 }
 
 #monthVue {
   background-color: transparent;
-  width: 60rem;
-  
-  height: 39rem;
-  border-bottom-right-radius: 1rem;
-  border-bottom-left-radius: 1rem;
+  width: 60vw;
+  height: calc(75vh - 6vh);
 }
 
 td {
   vertical-align: top;
-  padding-left: 1rem;
-  padding-top: 0.5rem;
+  padding-left: 1vw;
+  padding-top: 0.5vh;
   transition: all 0.1s ease-out;
-  border-radius: 1rem;
+  border-radius: 1vw;
 }
 
 td:hover {
@@ -158,33 +206,34 @@ td:hover {
   cursor: pointer;
 }
 
-td:active {
-  background-color: black;
+.today {
+  background-color: rgb(50, 50, 50);
+  color: white;
 }
 
+/* Fixed sidebutton positioning */
 #taskViewButton {
   left: 0;
-  border-top-right-radius: 1rem;
-  border-bottom-right-radius: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  border-top-right-radius: 1vw;
+  border-bottom-right-radius: 1vw;
 }
 
 #newTaskButton {
-  left: calc(100% - 3rem);
-  border-top-left-radius: 1rem;
-  border-bottom-left-radius: 1rem;
-}
-
-#newTaskButton:hover {
-  left: calc(100% - 5rem)
-  
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  border-top-left-radius: 1vw;
+  border-bottom-left-radius: 1vw;
 }
 
 .sidebutton {
-  height: 8rem;
-  width: 3rem;
+  height: 8vh;
+  width: 3vw;
   background-color: rgb(50, 50, 50);
-  position: absolute;
-  transition: all 0.1s ease-in-out; /* Smooth transition */
+  position: fixed; /* Changed from absolute to fixed */
+  transition: all 0.1s ease-in-out;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -192,34 +241,28 @@ td:active {
 }
 
 .sidebutton:hover {
-  height: 9rem;
-  width: 5rem;
+  height: 9vh;
+  width: 5vw;
 }
 
 main {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh; /* Ensures it takes full screen height */
-  width: 100%; /* Makes sure it's full width */
+  min-height: 100vh;
+  width: 100%;
+  position: relative;
 }
-
-.today {
-  background-color: rgb(50, 50, 50);
-  color: white;
-}
-
-
 
 #add {
   font-size: 2rem;
 }
+
 .material-symbols-outlined {
   font-variation-settings:
   'FILL' 0,
   'wght' 400,
   'GRAD' 0,
   'opsz' 24
-}
 }
 </style>
