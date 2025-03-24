@@ -4,6 +4,7 @@ import app from "../api/firebase"
 import { useRouter } from 'vue-router'
 import { getAuth, createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import handleError from "./loginAndReg/errorHandling";
+import { addUser, getUserData } from "./loginAndReg/databasecrap"
 
 // Form values
 const username = ref("");
@@ -11,7 +12,6 @@ const email = ref("")
 const password = ref("");
 let error = ref("");
 const router = useRouter()
-
 
 // Validation function
 const validateForm = (event) => {
@@ -28,6 +28,13 @@ function register(){
       // Signed in 
       const user = userCredential.user;
       updateProfile(user, {displayName: username.value, photoURL: "https://cdn.usdairy.com/optimize/getmedia/b5108b6f-59c3-4cc4-b1d5-4b9b0d1e0c54/swiss.jpg.jpg.aspx?format=webp"})
+      
+      addUser(user.email,{events: [{Date:10, name:"eat butt"}, {Date:30, name:"david stinks"}],
+                          tasks: [{Date:50, name:"launch app"}, {Date:20, name:"kill someone"}]
+                        })
+
+      getUserData(user.email)
+
       router.push({path:"/secure"})
       // ...
     })
