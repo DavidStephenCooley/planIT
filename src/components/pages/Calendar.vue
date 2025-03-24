@@ -1,11 +1,17 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
+import '@/assets/global.css'
 
 const today = new Date();
 const currentMonth = ref(today.getMonth());
 const currentYear = ref(today.getFullYear());
 const monthLabel = ref("MONTH");
 const calendar = ref([]);
+
+let viewTaskOpen = false;
+let newTaskOpen = false;
+let settingsOpen = false;
+
 
 const months = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", 
                "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
@@ -48,13 +54,27 @@ function getFirstDay(year, month) {
   return day === 0 ? 6 : day - 1;
 }
 
+function getNumWeeksInMonth() {
+  const daysInMonth = getDaysInMonth(currentYear.value, currentMonth.value);
+  const firstDay = getFirstDay(currentYear.value, currentMonth.value);
+  
+  // Calculate total cells needed (blank days at start + actual days)
+  const totalCells = firstDay + daysInMonth;
+  
+  // Calculate how many rows (weeks) are needed (rounding up)
+  return Math.ceil(totalCells / 7);
+}
+
+
 function generateCalendar() {
   let days = getDaysInMonth(currentYear.value, currentMonth.value);
   let firstDay = getFirstDay(currentYear.value, currentMonth.value);
   let grid = [];
-
+  
   let count = 1;
-  for (let row = 0; row < 6; row++) {
+  const weeksNeeded = getNumWeeksInMonth();
+  
+  for (let row = 0; row < weeksNeeded; row++) {
     let week = [];
     for (let col = 0; col < 7; col++) {
       if (row === 0 && col < firstDay) {
@@ -78,6 +98,62 @@ function isToday(day) {
     currentYear.value === today.getFullYear()
   );
 }
+
+  function popoutNewTask() {
+    newTaskOpen = !newTaskOpen;
+    let button = document.getElementById("newTaskButton");
+    if (newTaskOpen) {
+      button.style.height = "75vh";
+      button.style.width = "18vw";
+      button.style.justifyContent = "left";
+    } else {
+      button.style.height = "8vh";
+      button.style.width = "3vw";
+      button.style.justifyContent = "center";
+    }
+  }
+
+  function popoutViewTask() {
+    viewTaskOpen = !viewTaskOpen;
+    let button = document.getElementById("taskViewButton");
+    if (viewTaskOpen) {
+      if (settingsOpen) {
+        popoutSettings();
+      }
+      button.style.height = "75vh";
+      button.style.width = "18vw";
+      button.style.justifyContent = "right";
+      document.getElementById("viewTaskChevron").style.transform = "rotate(180deg)";
+    } else {
+      button.style.height = "8vh";
+      button.style.width = "3vw";
+      button.style.justifyContent = "center";
+      document.getElementById("viewTaskChevron").style.transform = "rotate(0deg)";
+    }
+  }
+
+    function popoutSettings() {
+    settingsOpen = !settingsOpen;
+    let button = document.getElementById("settings");
+    let inputs = document.getElementById("settingsHidden");
+    if (settingsOpen) {
+      if (viewTaskOpen) {
+        popoutViewTask();
+      }
+      
+      button.style.height = "45vh";
+      button.style.width = "18vw";
+      button.style.alignItems = "end";
+      button.style.paddingBottom = "1vh";
+      inputs.style.top = "0vh";
+    } else {
+      button.style.height = "8vh";
+      button.style.width = "3vw";
+      button.style.alignItems = "center";
+      inputs.style.top = "-100vh";
+    }
+  }
+
 </script>
 
 <template>
@@ -109,16 +185,37 @@ function isToday(day) {
         </table>
       </div>
     </div>
+    <div id="settings" class="settingsClass sidebutton">
+      <span @click="popoutSettings()" class="material-symbols-outlined" id="settingsIcon">settings</span>
+    </div>
+
+    <div id="settingsHidden" class="hidden settingsClass">
+      <span>Colour:</span>
+     <input
+      type="color" 
+      v-model="themeColor"
+      @change="updateTheme"
+      style="
+      width: 2vw;
+      height: 4.5vh;
+      border: none;
+      background: none;
+      cursor: pointer;
+      "
+    >
+    </div>
+
     <div id="taskViewButton" class="sidebutton">
-      <span class="material-symbols-outlined">arrow_forward_ios</span>
+      <span @click="popoutViewTask()" class="material-symbols-outlined" id="viewTaskChevron">arrow_forward_ios</span>
     </div>
     <div id="newTaskButton" class="sidebutton">
-      <span class="material-symbols-outlined" id="add">add</span>
+      <span  @click="popoutNewTask()" class="material-symbols-outlined" id="add">add</span>
     </div>
   </main>
 </template>
 
 <style scoped>
+
 html {
   font-size: 16px;
   overflow: hidden;
@@ -131,7 +228,7 @@ html {
 #monthHeader {
   left: calc(50% - 30vw + 2vw);
   top: 8vh;
-  background-color: rgb(66,66,66);
+  background-color: var(--chevroned-colour);
   width: 15vw;
   height: 5vh;
   border-top-left-radius: 1vw; border-top-right-radius: 1vw;
@@ -158,7 +255,7 @@ html {
 #surroundBox {
   height:75vh;
   width: 60vw;
-  background-color: rgb(66, 66, 66);
+  background-color: var(--header-colour);
   border-radius: 1vw;
   margin: 0 auto;
 }
@@ -166,7 +263,7 @@ html {
 #headerBox {
   height: 7vh;
   width: 60vw;
-  background-color: rgb(50, 50, 50);
+  background-color: var(--header-colour);
   border-top-left-radius: 1vw;
   border-top-right-radius: 1vw;
 }
@@ -174,7 +271,7 @@ html {
 #calenderBox {
   height: calc(75vh - 6vh);
   width: 60vw;
-  background-color: rgb(66, 66, 66);
+  background-color: var(--calendar-colour);
   top: 10vh;
   border-bottom-right-radius: 1vw;
   border-bottom-left-radius: 1vw;
@@ -199,19 +296,41 @@ td {
   padding-top: 0.5vh;
   transition: all 0.1s ease-out;
   border-radius: 1vw;
+
 }
 
 td:hover {
-  background-color: rgb(50, 50, 50);
+  background-color: var(--selected-day-colour);
   cursor: pointer;
 }
 
 .today {
-  background-color: rgb(50, 50, 50);
+  background-color: var(--today-colour);
+  color: var(--today-text-colour);
+  border-radius: 0.75vw;
+}
+
+.settingsClass {
+  background-color: var(--chevroned-colour);
+  left: 1vw;
+  top: 0;
+  border-bottom-right-radius: 1vw; border-bottom-left-radius: 1vw;
+}
+
+.hidden {
+  background-color: transparent;
   color: white;
 }
 
-/* Fixed sidebutton positioning */
+#settingsHidden {
+  position: fixed;
+  height: 40vh;
+  width: 18vw;
+  top: -100vh;
+  left: 1vw;
+
+}
+
 #taskViewButton {
   left: 0;
   top: 50%;
@@ -231,7 +350,7 @@ td:hover {
 .sidebutton {
   height: 8vh;
   width: 3vw;
-  background-color: rgb(50, 50, 50);
+  background-color: var(--chevroned-colour);
   position: fixed; /* Changed from absolute to fixed */
   transition: all 0.1s ease-in-out;
   display: flex;
@@ -243,6 +362,15 @@ td:hover {
 .sidebutton:hover {
   height: 9vh;
   width: 5vw;
+}
+
+#settings:hover {
+  width: 3vw;
+  height: 8vh;
+}
+
+#settingsIcon:hover {
+  transform: scale(1.4);
 }
 
 main {
@@ -259,6 +387,7 @@ main {
 }
 
 .material-symbols-outlined {
+  color: var(--text-colour);
   font-variation-settings:
   'FILL' 0,
   'wght' 400,
