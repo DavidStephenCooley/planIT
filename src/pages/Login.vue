@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from "vue";
-import app from "../api/firebase"
-import { useRouter } from 'vue-router'
+import app from "../api/firebase";
+import { useRouter } from 'vue-router';
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import handleError from "./loginAndReg/errorHandling";
 
@@ -10,6 +10,8 @@ const username = ref("");
 const password = ref("");
 const error = ref("");
 const router = useRouter()
+
+
 
 // Validation function
 const validateForm = (event) => {
@@ -25,6 +27,7 @@ function login(){
     .then((userCredential) => {
       // Signed in 
       const user = userCredential.user;
+      
       router.push({path:"/Secure"})
       // ...
     })
