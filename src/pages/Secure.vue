@@ -2,7 +2,7 @@
 import app from '../api/firebase';
 import { onMounted, ref } from "vue"
 import { getFunctions, httpsCallable} from "firebase/functions";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth } from "firebase/auth";
 
 let username = ref("")
 let profilePic = ref("")
@@ -21,11 +21,9 @@ async function load(){
     const secureFunction = httpsCallable(functions, 'secureFunction'); // Gets secure functions from firebase
 
     await secureFunction().then((result) => {
-        console.log(result); 
 
         if(result.data){ // If logged in
         let user = getAuth(app).currentUser // Get logged in user
-        console.log(user) // Print out user info
         
         username.value = user.displayName // Display name from firebase auth
         profilePic.value = user.photoURL // Photo from firebase auth
