@@ -2,7 +2,7 @@
 import app from '../api/firebase';
 import { onMounted, ref } from "vue"
 import { getFunctions, httpsCallable} from "firebase/functions";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth } from "firebase/auth";
 
 let username = ref("")
 let profilePic = ref("")
@@ -12,26 +12,24 @@ const auth = getAuth(app)
 signInWithEmailAndPassword(auth, "hi@gmail.com", "123456")
 */
 
+onMounted(()=>{ // On mounted - whenever a vue page is loaded
+    load() // When loaded runs load
+})
+
 async function load(){
-    const functions = getFunctions(app);
-    const secureFunction = httpsCallable(functions, 'secureFunction');
+    const functions = getFunctions(app); // Gets functions from firebase 
+    const secureFunction = httpsCallable(functions, 'secureFunction'); // Gets secure functions from firebase
 
     await secureFunction().then((result) => {
-        console.log(result); 
 
-        if(result.data){
-        let user = getAuth(app).currentUser
-        console.log(user)
+        if(result.data){ // If logged in
+        let user = getAuth(app).currentUser // Get logged in user
         
-        username.value = user.displayName
-        profilePic.value = user.photoURL
+        username.value = user.displayName // Display name from firebase auth
+        profilePic.value = user.photoURL // Photo from firebase auth
         }
     });
 }
-
-onMounted(()=>{
-    load()
-})
 
 </script>
 
@@ -46,8 +44,5 @@ onMounted(()=>{
 </template>
 
 <style>
-
-
-
 
 </style>

@@ -3,19 +3,19 @@ import { ref } from "vue";
 import app from "../api/firebase"
 import { useRouter } from 'vue-router'
 import { getAuth, createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import handleError from "./loginAndReg/errorHandling";
-import { addUser, getUserData } from "./loginAndReg/databasecrap"
+import handleError from "./loginAndReg/errorHandler";
+import { addUser, getUserData } from "./loginAndReg/userFunctions";
 
 // Form values
 const username = ref("");
 const email = ref("")
 const password = ref("");
-let error = ref("");
-const router = useRouter()
+const error = ref("");
+const router = useRouter() // gets the router
 
 // Validation function
 const validateForm = (event) => {
-  if (!username.value.length || !password.value.length){
+  if (!username.value.length || !password.value.length || !email.value.length){ // No submit unless all 3 are entered
     event.preventDefault();
   }
   register()
@@ -28,20 +28,22 @@ function register(){
       // Signed in 
       const user = userCredential.user;
       updateProfile(user, {displayName: username.value, photoURL: "https://cdn.usdairy.com/optimize/getmedia/b5108b6f-59c3-4cc4-b1d5-4b9b0d1e0c54/swiss.jpg.jpg.aspx?format=webp"})
-      
-      addUser(user.email,{events: [{Date:10, name:"eat butt"}, {Date:30, name:"david stinks"}],
-                          tasks: [{Date:50, name:"launch app"}, {Date:20, name:"kill someone"}]
+      //                                                            Profile picture for now ^
+      addUser(user.email,{events: [], // Data to be sent to database, TO DO: date/time of stuff sent in
+                          tasks: [],
+                          settings: {backgroundColour: "#181818", calendarColour: "#424242", todayColour: "#adadad", selectedDayColour: "#757575", 
+                                     chevronedColour: "#3a3a3a", headerColour: "#343434", textColour: "#b1b1b1", todayTextColour:"#0a0a0a"}
                         })
 
-      getUserData(user.email)
+      //getUserData(user.email)
 
       router.push({path:"/secure"})
-      // ...
+
     })
     .catch((e) => {
-      error.value = handleError(e)
+      error.value = handleError(e) // If something goes wrong go to error handler
       if (!username.value.length || !password.value.length || !email.value.length){
-        error.value = "please enter all fields"
+        error.value = "Please enter all fields"
       }
     });
 }
@@ -66,10 +68,8 @@ function register(){
       <div class="separator-line"></div>
     </div>
 
-    <routerLink to="/Login">Login Page</routerLink>
-
-    <a href="google-login.html" class="auth-link google-login">Sign Up with Google</a>
-    <a href="signup.html" class="auth-link">Sign Up with Email</a>
+    <button class="auth-link google-login">Sign Up with Google</button>
+    <button class="auth-link" @click="router.push('/login')">Sign In with Email</button>
   </div>
 </template>
 
