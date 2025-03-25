@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
 import '@/assets/global.css'
-import { updateSetting } from "./loginAndReg/userFunctions"
+import { updateSetting, getSetting, getUserData } from "./loginAndReg/userFunctions"
 
 const today = new Date();
 const currentMonth = ref(today.getMonth());
@@ -46,6 +46,7 @@ function nextMonth() {
 onMounted(() => {
   updateMonthLabel();
   updateCalendar();
+  loadTheme();
 });
 
 function getDaysInMonth(year, month) {
@@ -172,8 +173,13 @@ function isToday(day) {
 }
 
   function updateTheme(){
-    console.log(themeColor)
-    updateSetting("backgroundColour", themeColor)
+    const cssVarUpdate = document.documentElement.style
+    cssVarUpdate.setProperty("--background-colour", themeColor)
+  }
+
+  async function loadTheme(){
+    const cssVarUpdate = document.documentElement.style
+    cssVarUpdate.setProperty("--background-colour", await getSetting("backgroundColour"))
   }
 
   function dateUpdate(number) {
@@ -272,7 +278,8 @@ function isToday(day) {
      <input
       type="color" 
       v-model="themeColor"
-      @change="updateTheme()"
+      @input="updateTheme()"
+      @change="updateSetting('backgroundColour', themeColor)"
       style="
       width: 2vw;
       height: 4.5vh;
