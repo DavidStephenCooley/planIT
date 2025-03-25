@@ -43,17 +43,8 @@ async function load(){
 <template>
 
     <Calendar></Calendar>
-    <img id="pfp" v-bind:src="profilePic">
 
 </template>
 
 <style>
-    #pfp{
-        width: 70px;
-        height: 70px;
-        position: absolute;
-        right: 25px;
-        top: 25px;
-        border-radius: 10px;
-    }
 </style>
