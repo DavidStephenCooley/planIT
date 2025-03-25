@@ -21,7 +21,7 @@ function isAuth(to, from, next){
 function loadPage (component) {
     return () => import(`@/pages/${component}.vue`)}
 
-export default [{ path: '/', component: loadPage('Login') },
+export default [{ path: '/', component: loadPage('Login'), meta: { title: 'Login - PlanIT' } },
                 { path: '/Secure', component: loadPage('Secure'), beforeEnter: isAuth },
-                { path: '/Login', component: loadPage('Login') },
-                { path: '/Register', component: loadPage('Register') }]
+                { path: '/Login', component: loadPage('Login'), meta: { title: 'Login - PlanIT' } },
+                { path: '/Register', component: loadPage('Register'), meta: { title: 'Register - PlanIT' } }]

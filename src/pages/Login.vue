@@ -48,7 +48,7 @@ function login(){
     <h2>Login</h2>
 
     <form @submit="validateForm">
-      <input type="text" class="input-field" v-model="username" placeholder="Username">
+      <input type="text" class="input-field" v-model="username" placeholder="E-mail">
       <input type="password" class="input-field" v-model="password" placeholder="Password">
       <p v-if="error!=null" class="error-message" :key="error">{{ error }}</p>
       <button type="button" class="auth-button" @click="validateForm">Login</button>
