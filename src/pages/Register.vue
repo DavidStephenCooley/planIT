@@ -28,17 +28,9 @@ function register(){
       // Signed in 
       const user = userCredential.user;
       updateProfile(user, {displayName: username.value, photoURL: "https://cdn.usdairy.com/optimize/getmedia/b5108b6f-59c3-4cc4-b1d5-4b9b0d1e0c54/swiss.jpg.jpg.aspx?format=webp"})
+      router.push({path:"/secure"}) 
       //                                                            Profile picture for now ^
-      addUser(user.email,{events: [], // Data to be sent to database, TO DO: date/time of stuff sent in
-                          tasks: [],
-                          settings: {backgroundColour: "#181818", calendarColour: "#424242", todayColour: "#adadad", selectedDayColour: "#757575", 
-                                     chevronedColour: "#3a3a3a", headerColour: "#343434", textColour: "#b1b1b1", todayTextColour:"#0a0a0a"}
-                        })
-
-      //getUserData(user.email)
-
-      router.push({path:"/secure"})
-
+      
     })
     .catch((e) => {
       error.value = handleError(e) // If something goes wrong go to error handler

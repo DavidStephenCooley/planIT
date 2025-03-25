@@ -4,13 +4,7 @@ import app from "@/api/firebase";
 const db = getFirestore(app,"database1")
 
 export async function addUser(inpEmail, inpData){
-    if(await setDoc(doc(collection(db, "users"), `${inpEmail}`), {data:inpData})){
-        return true;
-    }
-    else{
-        return false;
-    }
-    
+    await setDoc(doc(collection(db, "users"), `${inpEmail}`), {data:inpData}).then((r)=>{console.log(r)})
 }
 
 export async function getUserData(inpEmail){

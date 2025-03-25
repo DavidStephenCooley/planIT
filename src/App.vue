@@ -1,4 +1,3 @@
-</script>
 
 <template>
   <header></header>
