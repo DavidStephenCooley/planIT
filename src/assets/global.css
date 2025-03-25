@@ -8,6 +8,7 @@
     --header-colour: #343434;
     --text-colour: rgb(177, 177, 177);
     --today-text-colour: rgb(10,10,10);
+    --other-month-text-colour: #888;
   }
 
   body {

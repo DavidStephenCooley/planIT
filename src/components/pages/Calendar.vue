@@ -67,9 +67,15 @@ function getNumWeeksInMonth() {
 
 
 function generateCalendar() {
-  let days = getDaysInMonth(currentYear.value, currentMonth.value);
-  let firstDay = getFirstDay(currentYear.value, currentMonth.value);
+  const daysInMonth = getDaysInMonth(currentYear.value, currentMonth.value);
+  const firstDay = getFirstDay(currentYear.value, currentMonth.value);
   let grid = [];
+  
+  // Calculate days from previous month to show
+  const prevMonthDays = getDaysInMonth(
+    currentMonth.value === 0 ? currentYear.value - 1 : currentYear.value,
+    currentMonth.value === 0 ? 11 : currentMonth.value - 1
+  );
   
   let count = 1;
   const weeksNeeded = getNumWeeksInMonth();
@@ -77,12 +83,20 @@ function generateCalendar() {
   for (let row = 0; row < weeksNeeded; row++) {
     let week = [];
     for (let col = 0; col < 7; col++) {
+      // Previous month days
       if (row === 0 && col < firstDay) {
-        week.push("");
-      } else if (count > days) {
-        week.push("");
-      } else {
-        week.push(count);
+        const day = prevMonthDays - firstDay + col + 1;
+        week.push({ day, isCurrentMonth: false });
+      } 
+      // Next month days
+      else if (count > daysInMonth) {
+        const day = count - daysInMonth;
+        week.push({ day, isCurrentMonth: false });
+        count++;
+      } 
+      // Current month days
+      else {
+        week.push({ day: count, isCurrentMonth: true });
         count++;
       }
     }
@@ -99,22 +113,34 @@ function isToday(day) {
   );
 }
 
-  function popoutNewTask() {
-    newTaskOpen = !newTaskOpen;
+  function popoutNewTask(calendarClick) {
+    if (calendarClick) {
+      newTaskOpen = true;
+    } else {
+      newTaskOpen = !newTaskOpen;
+    }
     let button = document.getElementById("newTaskButton");
+    let inputs = document.getElementById("newTaskHidden");
     if (newTaskOpen) {
       button.style.height = "75vh";
       button.style.width = "18vw";
       button.style.justifyContent = "left";
+      inputs.style.right = "0vw";
     } else {
       button.style.height = "8vh";
       button.style.width = "3vw";
       button.style.justifyContent = "center";
+      inputs.style.right = "-100vw";
     }
   }
 
-  function popoutViewTask() {
-    viewTaskOpen = !viewTaskOpen;
+  function popoutViewTask(calendarClick) {
+    if (calendarClick) {
+      viewTaskOpen = true;
+    } else {
+      viewTaskOpen = !viewTaskOpen;
+
+    }
     let button = document.getElementById("taskViewButton");
     if (viewTaskOpen) {
       if (settingsOpen) {
@@ -152,8 +178,8 @@ function isToday(day) {
       button.style.alignItems = "center";
       inputs.style.top = "-100vh";
     }
-  }
 
+  }
 </script>
 
 <template>
@@ -177,8 +203,15 @@ function isToday(day) {
         <table id="monthVue">
           <tbody>
             <tr v-for="(week, weekIndex) in calendar" :key="weekIndex">
-              <td v-for="(day, dayIndex) in week" :key="dayIndex" :class="{ today: isToday(day) }">
-                {{ day }}
+              <td @click="popoutViewTask(true)" v-on:dblclick="popoutNewTask(true)"
+                v-for="(day, dayIndex) in week" 
+                :key="dayIndex" 
+                :class="{ 
+                today: isToday(day.day) && day.isCurrentMonth,
+                'other-month': !day.isCurrentMonth
+                }"
+                >
+                {{ day.day }}
               </td>
             </tr>
           </tbody>
@@ -206,10 +239,13 @@ function isToday(day) {
     </div>
 
     <div id="taskViewButton" class="sidebutton">
-      <span @click="popoutViewTask()" class="material-symbols-outlined" id="viewTaskChevron">arrow_forward_ios</span>
+      <span @click="popoutViewTask(false)" class="material-symbols-outlined" id="viewTaskChevron">arrow_forward_ios</span>
     </div>
-    <div id="newTaskButton" class="sidebutton">
-      <span  @click="popoutNewTask()" class="material-symbols-outlined" id="add">add</span>
+    <div id="newTaskButton" class="newTaskButton sidebutton">
+      <span  @click="popoutNewTask(false)" class="material-symbols-outlined" id="add">add</span>
+    </div>
+    <div id="newTaskHidden" class="hidden newTaskButton">
+
     </div>
   </main>
 </template>
@@ -328,7 +364,13 @@ td:hover {
   width: 18vw;
   top: -100vh;
   left: 1vw;
+}
 
+#newTaskHidden {
+  position: fixed;
+  height: 75vh;
+  width: 16vw;
+  right: -100vw
 }
 
 #taskViewButton {
@@ -339,7 +381,7 @@ td:hover {
   border-bottom-right-radius: 1vw;
 }
 
-#newTaskButton {
+.newTaskButton {
   right: 0;
   top: 50%;
   transform: translateY(-50%);
@@ -371,6 +413,16 @@ td:hover {
 
 #settingsIcon:hover {
   transform: scale(1.4);
+}
+
+.other-month {
+  color: var(--other-month-text-colour);
+  opacity: 0.6;
+}
+
+.other-month:hover {
+  background-color: var(--selected-day-colour);
+  cursor: pointer;
 }
 
 main {
