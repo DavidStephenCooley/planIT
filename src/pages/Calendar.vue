@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
 import '@/assets/global.css'
+import { updateSetting } from "./loginAndReg/userFunctions"
 
 const today = new Date();
 const currentMonth = ref(today.getMonth());
@@ -12,6 +13,7 @@ let viewTaskOpen = false;
 let newTaskOpen = false;
 let settingsOpen = false;
 let selectDate = 0;
+let themeColor;
 
 
 const months = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", 
@@ -169,6 +171,11 @@ function isToday(day) {
   }
 }
 
+  function updateTheme(){
+    console.log(themeColor)
+    updateSetting("backgroundColour", themeColor)
+  }
+
   function dateUpdate(number) {
     selectDate = number;
   }
@@ -265,7 +272,7 @@ function isToday(day) {
      <input
       type="color" 
       v-model="themeColor"
-      @change="updateTheme"
+      @change="updateTheme()"
       style="
       width: 2vw;
       height: 4.5vh;
