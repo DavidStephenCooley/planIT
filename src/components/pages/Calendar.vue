@@ -11,6 +11,7 @@ const calendar = ref([]);
 let viewTaskOpen = false;
 let newTaskOpen = false;
 let settingsOpen = false;
+let selectDate = 0;
 
 
 const months = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", 
@@ -125,13 +126,51 @@ function isToday(day) {
       button.style.height = "75vh";
       button.style.width = "18vw";
       button.style.justifyContent = "left";
-      inputs.style.right = "0vw";
+      setTimeout(() => {
+        inputs.style.right = "0vw";        
+      }, 100);
     } else {
       button.style.height = "8vh";
       button.style.width = "3vw";
       button.style.justifyContent = "center";
       inputs.style.right = "-100vw";
     }
+  }
+
+  function addDate(dayObj) {
+  let month = currentMonth.value;
+  let year = currentYear.value;
+
+  // If the day is from a different month (prev/next), adjust month and year
+  if (!dayObj.isCurrentMonth) {
+    if (dayObj.day > 20) { // Likely a day from the previous month
+      month--;
+      if (month < 0) {
+        month = 11;
+        year--;
+      }
+    } else { // Likely a day from the next month
+      month++;
+      if (month > 11) {
+        month = 0;
+        year++;
+      }
+    }
+  }
+
+  // Format as YYYY-MM-DD (ISO format for `<input type="date">`)
+  const formattedDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(dayObj.day).padStart(2, '0')}`;
+  if (selectDate == 1) {
+    document.getElementById("date").value = formattedDate;
+    selectDate = 0;
+  } else if (selectDate == 2) {
+    document.getElementById("dateUntil").value = formattedDate;
+    selectDate = 0;
+  }
+}
+
+  function dateUpdate(number) {
+    selectDate = number;
   }
 
   function popoutViewTask(calendarClick) {
@@ -178,7 +217,6 @@ function isToday(day) {
       button.style.alignItems = "center";
       inputs.style.top = "-100vh";
     }
-
   }
 </script>
 
@@ -203,7 +241,7 @@ function isToday(day) {
         <table id="monthVue">
           <tbody>
             <tr v-for="(week, weekIndex) in calendar" :key="weekIndex">
-              <td @click="popoutViewTask(true)" v-on:dblclick="popoutNewTask(true)"
+              <td @click="popoutViewTask(true); addDate(day)" v-on:dblclick="popoutNewTask(true)"
                 v-for="(day, dayIndex) in week" 
                 :key="dayIndex" 
                 :class="{ 
@@ -245,7 +283,23 @@ function isToday(day) {
       <span  @click="popoutNewTask(false)" class="material-symbols-outlined" id="add">add</span>
     </div>
     <div id="newTaskHidden" class="hidden newTaskButton">
-
+      <input type="text" id="title" placeholder="Title"><br>
+      <input type="date" id="date" @click="dateUpdate(1)"><br>
+      <input type="checkbox" id="repeating"><label>Repeating</label><br>
+      <span id="repeatingText">
+        <label>Every</label><input type="number" placeholder="Number of">
+        <select>
+          <option value="days">Days</option>
+          <option value="weeks">Weeks</option>
+          <option value="months">Months</option>
+          <option value="years">Years</option>
+        </select><br>
+        <input type="checkbox" id="forever"><label>Forever</label>
+        <input type="checkbox" id="until"><label>Until</label><br>
+        <input type="date" id="dateUntil" @click="dateUpdate(2)"><br>
+        <label>Colour</label><input type="color" id="taskColour"><br>
+        <button>SAVE</button>
+      </span>
     </div>
   </main>
 </template>
@@ -366,11 +420,93 @@ td:hover {
   left: 1vw;
 }
 
+/* Main container styling */
 #newTaskHidden {
   position: fixed;
   height: 75vh;
-  width: 16vw;
-  right: -100vw
+  width: 34vh;
+  right: -100vw;
+  padding: 1vw;
+  background: transparent;
+}
+
+/* Input field styling */
+#newTaskHidden input[type="text"],
+#newTaskHidden input[type="date"],
+#newTaskHidden input[type="number"],
+#newTaskHidden select {
+  width: 100%;
+  padding: 0.69vw;
+  margin: 0.5vw 0;
+  border-radius: 0.5vw;
+  font-size: 1rem;
+}
+
+#newTaskHidden input[type="text"]:focus,
+#newTaskHidden input[type="date"]:focus,
+#newTaskHidden input[type="number"]:focus,
+#newTaskHidden select:focus {
+  border-color: #4a90e2;
+  outline: none;
+}
+
+/* Checkbox styling */
+#newTaskHidden input[type="checkbox"] {
+  margin-right: 0.5vw;
+  margin-left: 0.5vw;
+  accent-color: #4a90e2;
+}
+
+/* Label styling */
+#newTaskHidden label {
+  font-size: 1rem;
+  color: var(--text-colour);
+  margin-right: 1rem;
+  user-select: none;
+}
+
+/* Repeating options section */
+#repeatingText {
+  display: block;
+  margin-top: 0.5vh;
+}
+
+/* Color input styling */
+#newTaskHidden input[type="color"] {
+  width: 2vw;
+  height: 2vw;
+  border: none;
+  background: none;
+  cursor: pointer;
+  margin-left: 0vw;
+  vertical-align: middle;
+}
+
+/* Button styling */
+#newTaskHidden button {
+  width: 100%;
+  padding: 1vw;
+  margin-top: 1.75vh;
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 0.5vw;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+#newTaskHidden button:hover {
+  background-color: #3a7bc8;
+}
+
+/* Responsive adjustments */
+@media (max-width: 400px) {
+  #newTaskHidden {
+    width: 90%;
+    padding: 1vw;
+  }
 }
 
 #taskViewButton {
