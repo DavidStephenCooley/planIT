@@ -28,11 +28,3 @@ export async function updateSetting(settingName, settingValue){
     upd[`settings.${settingName}`] = settingValue
     await updateDoc(getUserDoc(), upd).then(console.log("saved setting:" + settingName))
 }
-
-export async function getSetting(settingName) {
-    const d = await getUserData()
-    console.log(d)
-    return d.settings[settingName]
-}
-
-

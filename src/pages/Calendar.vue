@@ -13,7 +13,9 @@ let viewTaskOpen = false;
 let newTaskOpen = false;
 let settingsOpen = false;
 let selectDate = 0;
-let themeColor;
+
+let backgroundColour;
+let calendarColour;
 
 
 const months = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", 
@@ -46,7 +48,7 @@ function nextMonth() {
 onMounted(() => {
   updateMonthLabel();
   updateCalendar();
-  loadTheme();
+  loadData();
 });
 
 function getDaysInMonth(year, month) {
@@ -174,20 +176,42 @@ function isToday(day) {
 
   function updateTheme(){
     const cssVarUpdate = document.documentElement.style
-    cssVarUpdate.setProperty("--background-colour", themeColor)
+    cssVarUpdate.setProperty("--background-colour", backgroundColour)
+    cssVarUpdate.setProperty("--calendar-colour", calendarColour)
   }
 
-  async function loadTheme(){
+  async function loadData(){
     const cssVarUpdate = document.documentElement.style
     await getUserData()
     .then((data)=>{
       const sett = data.settings
+
       cssVarUpdate.setProperty("--background-colour", sett.backgroundColour)
+      backgroundColour = sett.backgroundColour
+      document.getElementById("cssVarBG").value = backgroundColour
+
+      cssVarUpdate.setProperty("--calendar-colour", sett.calendarColour)
+      calendarColour = sett.calendarColour
+      document.getElementById("cssVarCalendarC").value = calendarColour
     })
     
   }
 
+  function collectTaskData(){
+    let taskData = {
+      title: document.getElementById("title").value,
+      date: document.getElementById("date").value,
+      isRepeating: document.getElementById("isRepeating").value || null,
+      repeatType: document.getElementById("repeatType").value,
+      forever: document.getElementById("forever").value,
+      until: document.getElementById("until").value,
+      dateUntil: document.getElementById("dateUntil").value || null,
+      taskColour: document.getElementById("taskColour").value
+    }
 
+    return taskData;
+
+  }
 
   function dateUpdate(number) {
     selectDate = number;
@@ -284,9 +308,24 @@ function isToday(day) {
       <span>Colour:</span>
      <input
       type="color" 
-      v-model="themeColor"
+      id="cssVarBG"
+      v-model="backgroundColour"
       @input="updateTheme()"
-      @change="updateSetting('backgroundColour', themeColor)"
+      @change="updateSetting('backgroundColour', backgroundColour)"
+      style="
+      width: 2vw;
+      height: 4.5vh;
+      border: none;
+      background: none;
+      cursor: pointer;
+      "
+    >
+    <input
+      type="color" 
+      id="cssVarCalendarC"
+      v-model="calendarColour"
+      @input="updateTheme()"
+      @change="updateSetting('calendarColour', calendarColour)"
       style="
       width: 2vw;
       height: 4.5vh;
@@ -319,7 +358,7 @@ function isToday(day) {
         <input type="checkbox" id="until"><label>Until</label><br>
         <input type="date" id="dateUntil" @click="dateUpdate(2)"><br>
         <label>Colour</label><input type="color" id="taskColour"><br>
-        <button @click="addToTasks()">SAVE</button>
+        <button @click="addToTasks(collectTaskData())">SAVE</button>
       </span>
     </div>
   </main>
