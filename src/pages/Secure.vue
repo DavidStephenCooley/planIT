@@ -4,7 +4,7 @@ import Calendar from "./Calendar.vue";
 import { onMounted, ref } from "vue"
 import { getFunctions, httpsCallable} from "firebase/functions";
 import { getAuth } from "firebase/auth";
-import { addUser } from "./loginAndReg/userFunctions"
+import { addUser } from "../components/loginAndRegFunctions/createUserFunctions"
 
 let username = ref("")
 let profilePic = ref("")

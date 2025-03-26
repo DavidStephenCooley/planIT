@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
 import '@/assets/global.css'
-import { updateSetting, getSetting, getUserData } from "./loginAndReg/userFunctions"
+import { updateSetting, getUserData, addToTasks } from "../components/databaseFunctions/userDataFunctions"
 
 const today = new Date();
 const currentMonth = ref(today.getMonth());
@@ -179,8 +179,15 @@ function isToday(day) {
 
   async function loadTheme(){
     const cssVarUpdate = document.documentElement.style
-    cssVarUpdate.setProperty("--background-colour", await getSetting("backgroundColour"))
+    await getUserData()
+    .then((data)=>{
+      const sett = data.settings
+      cssVarUpdate.setProperty("--background-colour", sett.backgroundColour)
+    })
+    
   }
+
+
 
   function dateUpdate(number) {
     selectDate = number;
@@ -299,10 +306,10 @@ function isToday(day) {
     <div id="newTaskHidden" class="hidden newTaskButton">
       <input type="text" id="title" placeholder="Title"><br>
       <input type="date" id="date" @click="dateUpdate(1)"><br>
-      <input type="checkbox" id="repeating"><label>Repeating</label><br>
+      <input type="checkbox" id="isRepeating"><label>Repeating</label><br>
       <span id="repeatingText">
         <label>Every</label><input type="number" placeholder="Number of">
-        <select>
+        <select id = "repeatType">
           <option value="days">Days</option>
           <option value="weeks">Weeks</option>
           <option value="months">Months</option>
@@ -312,7 +319,7 @@ function isToday(day) {
         <input type="checkbox" id="until"><label>Until</label><br>
         <input type="date" id="dateUntil" @click="dateUpdate(2)"><br>
         <label>Colour</label><input type="color" id="taskColour"><br>
-        <button>SAVE</button>
+        <button @click="addToTasks()">SAVE</button>
       </span>
     </div>
   </main>

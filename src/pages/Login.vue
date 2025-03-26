@@ -3,7 +3,7 @@ import { ref } from "vue";
 import app from "../api/firebase";
 import { useRouter } from 'vue-router';
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-import handleError from "./loginAndReg/errorHandler";
+import handleError from "../components/loginAndRegFunctions/errorHandler";
 
 // Form values
 const username = ref("");
