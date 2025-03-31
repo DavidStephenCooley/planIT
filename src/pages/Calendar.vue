@@ -17,6 +17,24 @@ let selectDate = 0;
 let backgroundColour;
 let calendarColour;
 
+const dataLoaded = ref(false)
+let tasks = []
+let tasksDict = []
+
+function getTasksForDate(day, isCurrentMonth){
+  let ind = currentYear.value + "-" + (currentMonth.value<10?"0":"")+(currentMonth.value+1) + "-" + (day<10?"0":"") + day
+  console.log(ind, tasksDict[ind])
+  if(isCurrentMonth)
+  return tasksDict[ind]
+  return null
+}
+
+async function refreshTaskPreviews() {
+  dataLoaded.value=false;
+  console.log(tasksDict)
+  setTimeout(()=>{dataLoaded.value=true}, 1)
+}
+
 
 const months = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", 
                "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
@@ -25,6 +43,7 @@ const months = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE",
 watch([currentMonth, currentYear], () => {
   updateMonthLabel();
   updateCalendar();
+  refreshTaskPreviews()
 });
 
 function updateMonthLabel() {
@@ -193,8 +212,21 @@ function isToday(day) {
       cssVarUpdate.setProperty("--calendar-colour", sett.calendarColour)
       calendarColour = sett.calendarColour
       document.getElementById("cssVarCalendarC").value = calendarColour
+
+      //TASKS
+      tasks = data.tasks;
+      let seen = []
+      const taskDay = (d1, d2)=>{
+        return new Date(d1.date).getTime() == new Date(d2).getTime()
+      }
+      for(const task of tasks){
+        if(seen[task.date])continue;
+        tasksDict[task.date] = tasks.filter((t)=>taskDay(t, task.date))
+        seen[task.data] = true;
+      }
+      console.log(tasksDict)
     })
-    
+    dataLoaded.value = true
   }
 
   function collectTaskData(){
@@ -294,6 +326,7 @@ function isToday(day) {
                 }"
                 >
                 {{ day.day }}
+                <div class="taskPreview" v-if="dataLoaded" v-for="box in getTasksForDate(day.day, day.isCurrentMonth)" :key="dataLoaded"></div>
               </td>
             </tr>
           </tbody>
@@ -386,6 +419,11 @@ html {
   align-items: center;
   justify-content: space-between;
   padding: 0 1vw;
+}
+
+.taskPreview{
+  height: 20px;
+  background-color: rgb(60, 255, 0);
 }
 
 .month-label {
