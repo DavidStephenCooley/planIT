@@ -1,4 +1,4 @@
-import { getFirestore, setDoc, collection, getDoc, doc, updateDoc, arrayUnion, arrayRemove, query, where} from "firebase/firestore";
+import { getFirestore, setDoc, collection, getDoc, doc, updateDoc, arrayUnion, arrayRemove, query, where, deleteDoc} from "firebase/firestore";
 import { getUserDoc } from "../loginAndRegFunctions/createUserFunctions"
 
 export async function getUserData(){
@@ -65,3 +65,54 @@ export async function setAllSettings(sett){
         console.error("Something went wrong:", error)
     }
 }
+
+export async function deleteUser(){
+    if(comfirm("Are you sure?")){
+        txt = "Deleteing"
+    
+    const auth = getAuth();
+    const user = auth.currentUser 
+        
+    if(user){
+        txt = "Deleteing"
+        deleteUser(user)
+        .then(() => {
+            console.log("User account deleted successfully.");
+          })
+          .catch((error) => {
+            console.error("Error deleting user:", error);
+          });
+      } else {
+        txt = "Cancelling"
+        console.log("No user is currently signed in.");
+    }
+    }
+}
+
+/*   if(comfirm("Are you sure?")){
+        txt = "Deleteing"
+    
+        try {
+            const userRef = collection(db,"users");
+            const query = query(userRef, where("email", "==", email));
+            const querySnapShot = await getDocs(query); 
+
+            if(querySnapShot.empty){
+                console.log("User doesn't exsist");
+                return;
+            }
+
+            querySnapShot.forEach(async (docsnap)=>{
+                await deleteDoc(doc(db, "users", docsnap.id));
+                console.log("user deleted")
+            })
+            
+        } catch (error) {
+            console.error("Error when deleting:", error)
+        }
+    }
+    else{
+        txt = "Cancelling"
+        return null;
+    } */
+
