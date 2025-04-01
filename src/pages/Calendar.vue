@@ -13,6 +13,8 @@ const currentYear = ref(today.getFullYear());
 const monthLabel = ref("MONTH");
 const calendar = ref([]);
 
+let repeatingCheck = false;
+let foreverCheck = true;
 let viewTaskOpen = false;
 let newTaskOpen = false;
 let settingsOpen = false;
@@ -210,7 +212,6 @@ function isToday(day) {
       cssVarUpdate.setProperty("--other-month-text-colour", sett.otherMonthTextColour)
       otherMonthTextColour = sett.otherMonthTextColour
       document.getElementById("cssVarOtherMonthText").value = otherMonthTextColour
-      
 
       cssVarUpdate.setProperty("--chevroned-colour", sett.chevronedColour)
       chevronedColour = sett.chevronedColour
@@ -367,7 +368,6 @@ function isToday(day) {
       viewTaskOpen = true;
     } else {
       viewTaskOpen = !viewTaskOpen;
-
     }
     let button = document.getElementById("taskViewButton");
     if (viewTaskOpen) {
@@ -385,7 +385,6 @@ function isToday(day) {
       document.getElementById("viewTaskChevron").style.transform = "rotate(0deg)";
     }
   }
-
     function popoutSettings() {
     settingsOpen = !settingsOpen;
     let button = document.getElementById("settings");
@@ -407,6 +406,42 @@ function isToday(day) {
       inputs.style.top = "-100vh";
     }
   }
+
+  function repeatingClick() {
+    const text = document.getElementById("repeatingText")
+    if(repeatingCheck == false) {
+      text.style.opacity = "100%";
+      text.style.pointerEvents = "all";
+      text.style.userSelect = "all";
+      repeatingCheck = true;
+    }
+    else {
+      text.style.opacity = "60%";
+      text.style.pointerEvents = "none";
+      text.style.userSelect = "none";
+      repeatingCheck = false;
+    }
+  }
+
+  function foreverClick() {
+    const forever = document.getElementById("forever");
+    const until = document.getElementById("until");
+    const untilText = document.getElementById("dateUntil");
+    if(foreverCheck == true) {
+      forever.checked = false
+      until.checked = true
+      foreverCheck = false;
+      untilText.style.opacity = "100%"
+    }
+    else {
+      forever.checked = true
+      until.checked = false
+      foreverCheck = true;
+      untilText.style.opacity = "60%"
+  }
+  }
+
+
 </script>
 
 <template>
@@ -430,7 +465,7 @@ function isToday(day) {
         <table id="monthVue">
           <tbody>
             <tr v-for="(week, weekIndex) in calendar" :key="weekIndex">
-              <td @click="popoutViewTask(true); addDate(day)" v-on:dblclick="popoutNewTask(true)"
+              <td class="calanderDay" @click="popoutViewTask(true); addDate(day)" v-on:dblclick="popoutNewTask(true)"
                 v-for="(day, dayIndex) in week" 
                 :key="dayIndex" 
                 :class="{ 
@@ -439,8 +474,10 @@ function isToday(day) {
                 }"
                 >
                 {{ day.day }}
-                <div class="taskPreview" v-if="dataLoaded" v-for="box in getTasksForDate(day.day, day.isCurrentMonth)" :key="dataLoaded"></div>
-              </td>
+                <div class="taskPreviewContainer">
+                  <div class="taskPreview" v-if="dataLoaded" v-for="box in getTasksForDate(day.day, day.isCurrentMonth)" :key="dataLoaded"></div>
+                </div>
+             </td>
             </tr>
           </tbody>
         </table>
@@ -454,70 +491,52 @@ function isToday(day) {
     <span>Background:</span>
     <input
       type="color" 
+      class="settingsColor"
       id="cssVarBG"
       v-model="backgroundColour"
       @input="updateTheme()"
       @change="updateSetting('backgroundColour', backgroundColour)"
-      style="
-      width: 2vw;
-      height: 2vw;
-      border: none;
-      background: none;
-      cursor: pointer;
-      "
+    
     > <br>
     <span>Calendar:</span>
     <input
       type="color" 
+      class="settingsColor"
       id="cssVarCalendar"
       v-model="calendarColour"
       @input="updateTheme()"
       @change="updateSetting('calendarColour', calendarColour)"
-      style="
-      width: 2vw;
-      height: 2vw;
-      border: none;
-      background: none;
-      cursor: pointer;
-      "
+      
     > <br>
     <span>Today:</span>
     <input
       type="color" 
+      class="settingsColor"
       id="cssVarToday"
       v-model="todayColour"
       @input="updateTheme()"
       @change="updateSetting('todayColour', todayColour)"
-      style="
-      width: 2vw;
-      height: 2vw;
-      border: none;
-      background: none;
-      cursor: pointer;
-      "
+      
     > <br>
     <span>Chosen Day:</span>
     <input
       type="color" 
+      class="settingsColor"
       id="cssVarSelected"
       v-model="selectedDayColour"
       @input="updateTheme()"
       @change="updateSetting('selectedDayColour', selectedDayColour)"
-      style="
-      width: 2vw;
-      height: 2vw;
-      border: none;
-      background: none;
-      cursor: pointer;
-      "
+      
     > <br>
     <span>Tabs:</span>
     <input
       type="color" 
+      class="settingsColor"
       id="cssVarChevroned"
       v-model="chevronedColour"
       @input="updateTheme()"
       @change="updateSetting('chevronedColour', chevronedColour)"
+      
       style="
       width: 2vw;
       height: 2vw;
@@ -526,68 +545,48 @@ function isToday(day) {
       cursor: pointer;
       ">
       <br>
+
     <span>Header:</span>
     <input
-      type="color" 
+      type="color"
+      class="settingsColor"
       id="cssVarHeader"
       v-model="headerColour"
       @input="updateTheme()"
       @change="updateSetting('headerColour', headerColour)"
-      style="
-      width: 2vw;
-      height: 2vw;
-      border: none;
-      background: none;
-      cursor: pointer;
-      "
+      
     > <br>
     <span>Text:</span>
     <input
       type="color" 
+      class="settingsColor"
       id="cssVarText"
       v-model="textColour"
       @input="updateTheme()"
       @change="updateSetting('textColour', textColour)"
-      style="
-      width: 2vw;
-      height: 2vw;
-      border: none;
-      background: none;
-      cursor: pointer;
-      "
+      
     > <br>
     <span>Today's Text:</span>
     <input
       type="color" 
+      class="settingsColor"
       id="cssVarTodayText"
       v-model="todayTextColour"
       @input="updateTheme()"
       @change="updateSetting('todayTextColour', todayTextColour)"
-      style="
-      width: 2vw;
-      height: 2vw;
-      border: none;
-      background: none;
-      cursor: pointer;
-      "
+      
     > <br>
     <span>Extra Days:</span>
     <input
       type="color" 
+      class="settingsColor"
       id="cssVarOtherMonthText"
       v-model="otherMonthTextColour"
       @input="updateTheme()"
       @change="updateSetting('otherMonthTextColour', otherMonthTextColour)"
-      style="
-      width: 2vw;
-      height: 2vw;
-      border: none;
-      background: none;
-      cursor: pointer;
-      "
+      
     > <br>
     <button @click="resetToDefaultColours()">Reset to Default</button>
- 
     
     <button
       @click="signOutUser(router)"
@@ -596,7 +595,9 @@ function isToday(day) {
       height: 4.5vh;">
       Sign Out
     </button>
+
     </div>
+
 
     <div id="taskViewButton" class="sidebutton">
       <span @click="popoutViewTask(false)" class="material-symbols-outlined" id="viewTaskChevron">arrow_forward_ios</span>
@@ -606,9 +607,12 @@ function isToday(day) {
     </div>
     <div id="newTaskHidden" class="hidden newTaskButton">
       <input type="text" id="title" placeholder="Title"><br>
-      <input type="date" id="date" @click="dateUpdate(1)" class="nohighlight"><br>
-      <input type="checkbox" id="isRepeating"><label>Repeating</label><br>
-      <span id="repeatingText">
+
+      <input type="date" id="date" @click="dateUpdate(1)"><br>
+      <input type="checkbox" id="isRepeating" 
+      @click="repeatingClick()"><label>Repeating</label><br>
+      <div id="repeatingText">
+
         <label>Every</label><input type="number" placeholder="Number of">
         <select id = "repeatType">
           <option value="days">Days</option>
@@ -616,12 +620,15 @@ function isToday(day) {
           <option value="months">Months</option>
           <option value="years">Years</option>
         </select><br>
-        <input type="checkbox" id="forever"><label>Forever</label>
-        <input type="checkbox" id="until"><label>Until</label><br>
-        <input type="date" id="dateUntil" @click="dateUpdate(2)" class="nohighlight"><br>
-        <label>Colour</label><input type="color" id="taskColour"><br>
-        <button @click="addToTasks(collectTaskData())">SAVE</button>
-      </span>
+
+        <input type="checkbox" @click="foreverClick(1)"id="forever" checked="true"><label>Forever</label>
+        <input type="checkbox" @click="foreverClick(2)"id="until"><label>Until</label><br>
+        <input type="date" id="dateUntil" @click="dateUpdate(2)"><br>
+      </div>
+      <input type="text" id="taskDescription" placeholder="Add description...">
+      <label>Colour</label><input type="color" id="taskColour"><br>
+      <button @click="addToTasks(collectTaskData())">SAVE</button>
+
     </div>
   </main>
 </template>
@@ -631,14 +638,34 @@ function isToday(day) {
 html {
   font-size: 16px;
   overflow: hidden;
+  margin: none;
+}
+
+main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100%;
+  position: relative;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+table {
+  position: relative;
+  table-layout: fixed;
+  border-collapse: collapse;
 }
 
 .box {
   position: absolute;
 }
 
+
 #monthHeader {
-  left: calc(50% - 30vw + 2vw);
+  left: calc(50% - 30vw + 2vw); /*needs to be offset size of calander - a little*/
   top: 8vh;
   background-color: var(--chevroned-colour);
   width: 15vw;
@@ -650,9 +677,19 @@ html {
   padding: 0 1vw;
 }
 
+.taskPreviewContainer {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap; /*starts new line once previous is full of tasks*/
+  max-height: 6vh; /*each vw counts 1 task in row before wrap to new line*/
+  gap: 0.5vh; /*margin*/
+}
+
 .taskPreview{
-  height: 20px;
-  background-color: rgb(60, 255, 0);
+  height: 1.5vh;
+  width: 1.5vh;
+  border-radius: 1.5vh;
+  background-color: #3a7bc8;
 }
 
 .month-label {
@@ -709,11 +746,11 @@ html {
 
 td {
   vertical-align: top;
+  height: 12vh; /*set height so adding task divs doesent effect height*/
   padding-left: 1vw;
   padding-top: 0.5vh;
   transition: all 0.1s ease-out;
   border-radius: 1vw;
-
 }
 
 td:hover {
@@ -747,7 +784,16 @@ td:hover {
   left: 1vw;
 }
 
-/* Main container styling */
+.SettingsColor {
+  width: 1vw;
+  height: 1vw;
+  border: none;
+  background: none;
+  cursor: pointer;
+  margin-left: 0vw;
+  vertical-align: middle;
+}
+
 #newTaskHidden {
   position: fixed;
   height: 75vh;
@@ -800,6 +846,15 @@ td:hover {
 #repeatingText {
   display: block;
   margin-top: 0.5vh;
+  opacity: 60%;
+  pointer-events: none;
+  user-select: none;
+}
+
+#dateUntil {
+  opacity: 60%;
+  pointer-events: none;
+  user-select: none;
 }
 
 /* Color input styling */
@@ -890,15 +945,6 @@ td:hover {
 .other-month:hover {
   background-color: var(--selected-day-colour);
   cursor: pointer;
-}
-
-main {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  width: 100%;
-  position: relative;
 }
 
 #add {
