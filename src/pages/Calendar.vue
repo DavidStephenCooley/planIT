@@ -1,7 +1,11 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
+import { getAuth, signOut } from 'firebase/auth';
+import { useRouter } from 'vue-router';
 import '@/assets/global.css'
 import { updateSetting, getUserData, addToTasks } from "../components/databaseFunctions/userDataFunctions"
+
+const router = useRouter()
 
 const today = new Date();
 const currentMonth = ref(today.getMonth());
@@ -229,6 +233,19 @@ function isToday(day) {
     dataLoaded.value = true
   }
 
+  function signOutUser(){
+    const auth = getAuth()
+    signOut(auth)
+        .then(()=> {
+            console.log("wudup")
+            router.push({path:"/"})
+             //Sign out success, then route to back to login page? Or just update whether signed in or not
+        }).catch((error)=>{
+            console.error("Sign out error: ", error)
+    })
+
+  }
+
   function collectTaskData(){
     let taskData = {
       title: document.getElementById("title").value,
@@ -367,6 +384,18 @@ function isToday(day) {
       cursor: pointer;
       "
     >
+    <button
+      @click="signOutUser(router)"
+      style="
+      width: 2vw;
+      height: 4.5vh;
+      border: none;
+      background: none;
+      cursor: pointer;
+      "
+    > 
+    Sign Out
+    </button>
     </div>
 
     <div id="taskViewButton" class="sidebutton">

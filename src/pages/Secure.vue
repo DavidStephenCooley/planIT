@@ -3,11 +3,13 @@ import app from '../api/firebase';
 import Calendar from "./Calendar.vue";
 import { onMounted, ref } from "vue"
 import { getFunctions, httpsCallable} from "firebase/functions";
-import { getAuth } from "firebase/auth";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { addUser } from "../components/loginAndRegFunctions/createUserFunctions"
 
 let username = ref("")
 let profilePic = ref("")
+
+
 
 onMounted(()=>{ // On mounted - whenever a vue page is loaded
     load() // When loaded runs load
@@ -19,8 +21,11 @@ async function checkData() {
     addUser(auth.email,{events: [], // Data to be sent to database, TO DO: date/time of stuff sent in
                         tasks: [],
                         settings: {backgroundColour: "#181818", calendarColour: "#424242", todayColour: "#adadad", selectedDayColour: "#757575", 
-                                    chevronedColour: "#3a3a3a", headerColour: "#343434", textColour: "#b1b1b1", todayTextColour:"#0a0a0a"}
+                                    chevronedColour: "#3a3a3a", headerColour: "#343434", textColour: "#b1b1b1", todayTextColour:"#0a0a0a", otherMonthTextColour:"#888888"}
                     })
+    onAuthStateChanged(auth, ()=>{
+        
+    })
 
 }
 
