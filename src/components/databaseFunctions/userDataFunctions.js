@@ -2,9 +2,14 @@ import { getFirestore, setDoc, collection, getDoc, doc, updateDoc, arrayUnion, a
 import { getUserDoc } from "../loginAndRegFunctions/createUserFunctions"
 
 export async function getUserData(){
-    const userData = await getDoc(getUserDoc()) // Gets all data of the user within their document ie. json file
+    try {
+        const userData = await getDoc(getUserDoc()) // Gets all data of the user within their document ie. json file
     //console.log("retrieval from database: ", userData.data())
     return userData.data();
+    } catch (error) {
+        console.error("Something went wrong:", error)
+    }
+    
 } 
 
 export async function addToEvents(event){
