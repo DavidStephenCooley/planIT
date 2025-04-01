@@ -1,9 +1,10 @@
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted, useTemplateRef } from "vue";
 import app from "../api/firebase";
 import { useRouter } from 'vue-router';
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import handleError from "../components/loginAndRegFunctions/errorHandler";
+import e from "cors";
 
 // Form values
 const username = ref("");
@@ -39,6 +40,17 @@ function login(){
       }
     });
 }
+
+onMounted(() => { // Allows user to press enter instead of needing to press the login button
+  const loginButton =  document.querySelectorAll('.input-field').forEach((inp)=>{
+    inp.addEventListener("keypress", function (event) {
+      if (event.key === "Enter") {
+        validateForm(event);
+      }
+    });
+  })
+});
+
 </script>
 
 <template>
@@ -48,10 +60,10 @@ function login(){
     <h2>Login</h2>
 
     <form @submit="validateForm">
-      <input type="text" class="input-field" v-model="username" placeholder="E-mail">
-      <input type="password" class="input-field" v-model="password" placeholder="Password">
+      <input type="text" ref="loginButton" class="input-field" v-model="username" placeholder="E-mail">
+      <input type="password" ref="loginButton" class="input-field" v-model="password" placeholder="Password">
       <p v-if="error!=null" class="error-message" :key="error">{{ error }}</p>
-      <button type="button" class="auth-button" @click="validateForm">Login</button>
+      <button type="button"  class="auth-button" @click="validateForm">Login</button>
     </form>
 
     <div class="separator-container">
@@ -60,12 +72,14 @@ function login(){
       <div class="separator-line"></div>
     </div>
 
-    <button class="auth-link google-login">Sign Up with Google</button>
-    <button class="auth-link" @click="router.push('/register')">Sign Up with Email</button>
+    <!--<button class="auth-link google-login">Sign Up with Google</button>-->
+    <button class="auth-link" @click="router.push({path: '/register'})">Sign Up with Email</button>
   </div>
 </template>
 
 <style>
 @import "@/assets/loginStyle.css";
 </style>
+
+
 

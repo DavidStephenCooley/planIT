@@ -1,7 +1,11 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
+import { getAuth, signOut } from 'firebase/auth';
+import { useRouter } from 'vue-router';
 import '@/assets/global.css'
 import { updateSetting, getUserData, addToTasks } from "../components/databaseFunctions/userDataFunctions"
+
+const router = useRouter()
 
 const today = new Date();
 const currentMonth = ref(today.getMonth());
@@ -313,6 +317,19 @@ function isToday(day) {
       document.getElementById("cssVarTodayText").value = todayTextColour
 
     updateTheme();
+
+  function signOutUser(){
+    const auth = getAuth()
+    signOut(auth)
+        .then(()=> {
+            console.log("wudup")
+            router.push({path:"/"})
+             //Sign out success, then route to back to login page? Or just update whether signed in or not
+        }).catch((error)=>{
+            console.error("Sign out error: ", error)
+    })
+
+
   }
 
   function collectTaskData(){
@@ -497,8 +514,8 @@ function isToday(day) {
       border: none;
       background: none;
       cursor: pointer;
-      "
-    > <br>
+      ">
+      <br>
     <span>Header:</span>
     <input
       type="color" 
@@ -560,8 +577,15 @@ function isToday(day) {
       "
     > <br>
     <button @click="resetToDefaultColours()">Reset to Default</button>
-
+ 
     
+    <button
+      @click="signOutUser(router)"
+      style="
+      width: 2vw;
+      height: 4.5vh;>
+      Sign Out
+    </button>
     </div>
 
     <div id="taskViewButton" class="sidebutton">
