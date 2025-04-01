@@ -1,9 +1,10 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, onBeforeUpdate } from 'vue';
 import { getAuth, signOut } from 'firebase/auth';
 import { useRouter } from 'vue-router';
 import '@/assets/global.css'
 import { updateSetting, getUserData, addToTasks, setAllSettings } from "../components/databaseFunctions/userDataFunctions"
+import app from '@/api/firebase';
 
 const router = useRouter()
 
@@ -75,11 +76,12 @@ function nextMonth() {
   if (currentMonth.value === 0) currentYear.value++;
 }
 
-onMounted(() => {
+onMounted(()=>{
+  console.log("mounted")
   updateMonthLabel();
   updateCalendar();
   loadData();
-});
+})
 
 function getDaysInMonth(year, month) {
   return new Date(year, month + 1, 0).getDate();
@@ -199,6 +201,7 @@ function isToday(day) {
     const cssVarUpdate = document.documentElement.style
     await getUserData()
     .then((data)=>{
+      console.log(data)
       const sett = data.settings
 
       cssVarUpdate.setProperty("--background-colour", sett.backgroundColour)
@@ -248,7 +251,7 @@ function isToday(day) {
         tasksDict[task.date] = tasks.filter((t)=>taskDay(t, task.date))
         seen[task.data] = true;
       }
-      console.log(tasksDict)
+      //console.log(tasksDict)
     })
     dataLoaded.value = true
   }
@@ -302,7 +305,7 @@ function isToday(day) {
     const auth = getAuth()
     signOut(auth)
         .then(()=> {
-            console.log("wudup")
+            //console.log("wudup")
             router.push({path:"/"})
              //Sign out success, then route to back to login page? Or just update whether signed in or not
         }).catch((error)=>{
@@ -325,15 +328,15 @@ function isToday(day) {
     }
 
     const thing = document.getElementById("date").value
-    console.log("taks",tasksDict[date])
+    //console.log("taks",tasksDict[date])
     if(tasksDict[thing] != undefined){
       tasksDict[thing].push(taskData)
     }else{
       tasksDict[thing] = [taskData]
     }
     refreshTaskPreviews()
+    //console.log(taskData)
     return taskData;
-
   }
 
   function dateUpdate(number) {
@@ -475,7 +478,7 @@ function isToday(day) {
                 >
                 {{ day.day }}
                 <div class="taskPreviewContainer">
-                  <div class="taskPreview" v-if="dataLoaded" v-for="box in getTasksForDate(day.day, day.isCurrentMonth)" :key="dataLoaded"></div>
+                  <div class="taskPreview" v-if="dataLoaded" v-for="box in getTasksForDate(day.day, day.isCurrentMonth)" :key="dataLoaded" :style="{backgroundColor:box.taskColour}"> {{ box.title }} </div>
                 </div>
              </td>
             </tr>

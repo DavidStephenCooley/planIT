@@ -5,16 +5,13 @@ function isAuth(to, from, next) {
     console.log("Checking auth");
     const auth = getAuth(app);
 
-
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            console.log("User is authenticated:", user);
+        if (auth) {
+            console.log("User is authenticated:");
             next(); 
         } else {
             console.log("User is not authenticated, redirecting to login.");
             next({ path: "/Login" });
         }
-    });
 }
 
 function loadPage(component) {

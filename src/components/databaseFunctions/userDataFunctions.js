@@ -3,7 +3,9 @@ import { getUserDoc } from "../loginAndRegFunctions/createUserFunctions"
 
 export async function getUserData(){
     try {
-        const userData = await getDoc(getUserDoc()) // Gets all data of the user within their document ie. json file
+        const u = getUserDoc()
+        console.log(u)
+        const userData = await getDoc(u) // Gets all data of the user within their document ie. json file
     //console.log("retrieval from database: ", userData.data())
     return userData.data();
     } catch (error) {
@@ -29,8 +31,9 @@ export async function removeFromEvents(event){
 }
 
 export async function addToTasks(event){
+    console.log(event)
     try {
-        await updateDoc(getUserDoc(), {events: arrayRemove(event)})
+        await updateDoc(getUserDoc(), {tasks: arrayUnion(event)})
     } catch (error) {
         console.error("Something went wrong:", error)
     }

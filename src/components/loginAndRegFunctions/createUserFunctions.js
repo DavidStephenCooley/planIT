@@ -3,9 +3,8 @@ import app from "@/api/firebase";
 import { getAuth, signOut } from "firebase/auth"
 
 const db = getFirestore(app,"database1")
-const auth = getAuth()
 
-export function getUser(){
+function getUser(){
     return getAuth(app).currentUser
 }
 
