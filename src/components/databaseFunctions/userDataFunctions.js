@@ -28,3 +28,7 @@ export async function updateSetting(settingName, settingValue){
     upd[`settings.${settingName}`] = settingValue
     await updateDoc(getUserDoc(), upd).then(console.log("saved setting:" + settingName))
 }
+
+export async function setAllSettings(sett){
+    await updateDoc(getUserDoc(), {settings: sett})
+}
