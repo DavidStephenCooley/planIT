@@ -149,29 +149,6 @@ function isToday(day) {
   );
 }
 
-  function popoutNewTask(calendarClick) {
-    if (calendarClick) {
-      newTaskOpen = true;
-    } else {
-      newTaskOpen = !newTaskOpen;
-    }
-    let button = document.getElementById("newTaskButton");
-    let inputs = document.getElementById("newTaskHidden");
-    if (newTaskOpen) {
-      button.style.height = "75vh";
-      button.style.width = "18vw";
-      button.style.justifyContent = "left";
-      setTimeout(() => {
-        inputs.style.right = "0vw";        
-      }, 100);
-    } else {
-      button.style.height = "8vh";
-      button.style.width = "3vw";
-      button.style.justifyContent = "center";
-      inputs.style.right = "-100vw";
-    }
-  }
-
   function addDate(dayObj) {
   let month = currentMonth.value;
   let year = currentYear.value;
@@ -317,6 +294,7 @@ function isToday(day) {
       document.getElementById("cssVarTodayText").value = todayTextColour
 
     updateTheme();
+  }
 
   function signOutUser(){
     const auth = getAuth()
@@ -352,7 +330,31 @@ function isToday(day) {
     selectDate = number;
   }
 
+  function popoutNewTask(calendarClick) {
+    if (calendarClick) {
+      newTaskOpen = true;
+    } else {
+      newTaskOpen = !newTaskOpen;
+    }
+    let button = document.getElementById("newTaskButton");
+    let inputs = document.getElementById("newTaskHidden");
+    if (newTaskOpen) {
+      button.style.height = "75vh";
+      button.style.width = "18vw";
+      button.style.justifyContent = "left";
+      setTimeout(() => {
+        inputs.style.right = "0vw";        
+      }, 100);
+    } else {
+      button.style.height = "8vh";
+      button.style.width = "3vw";
+      button.style.justifyContent = "center";
+      inputs.style.right = "-100vw";
+    }
+  }
+
   function popoutViewTask(calendarClick) {
+    console.log("michale fbiowbwo")
     if (calendarClick) {
       viewTaskOpen = true;
     } else {
@@ -583,7 +585,7 @@ function isToday(day) {
       @click="signOutUser(router)"
       style="
       width: 2vw;
-      height: 4.5vh;>
+      height: 4.5vh;">
       Sign Out
     </button>
     </div>
