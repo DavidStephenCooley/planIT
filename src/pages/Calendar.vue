@@ -20,6 +20,13 @@ let selectDate = 0;
 
 let backgroundColour;
 let calendarColour;
+let chevronedColour;
+let headerColour;
+let selectedDayColour;
+let textColour;
+let todayColour;
+let todayTextColour;
+let otherMonthTextColour;
 
 const dataLoaded = ref(false)
 let tasks = []
@@ -201,6 +208,14 @@ function isToday(day) {
     const cssVarUpdate = document.documentElement.style
     cssVarUpdate.setProperty("--background-colour", backgroundColour)
     cssVarUpdate.setProperty("--calendar-colour", calendarColour)
+    cssVarUpdate.setProperty("--chevroned-colour", chevronedColour)
+    cssVarUpdate.setProperty("--header-colour", headerColour)
+    cssVarUpdate.setProperty("--selected-day-colour", selectedDayColour)
+    cssVarUpdate.setProperty("--text-colour", textColour)
+    cssVarUpdate.setProperty("--today-colour", todayColour)
+    cssVarUpdate.setProperty("--today-text-colour", todayTextColour)
+    cssVarUpdate.setProperty("--other-month-text-colour", otherMonthTextColour)
+
   }
 
   async function loadData(){
@@ -215,7 +230,36 @@ function isToday(day) {
 
       cssVarUpdate.setProperty("--calendar-colour", sett.calendarColour)
       calendarColour = sett.calendarColour
-      document.getElementById("cssVarCalendarC").value = calendarColour
+      document.getElementById("cssVarCalendar").value = calendarColour
+      
+      cssVarUpdate.setProperty("--other-month-text-colour", sett.otherMonthTextColour)
+      otherMonthTextColour = sett.otherMonthTextColour
+      document.getElementById("cssVarOtherMonthText").value = otherMonthTextColour
+      
+
+      cssVarUpdate.setProperty("--chevroned-colour", sett.chevronedColour)
+      chevronedColour = sett.chevronedColour
+      document.getElementById("cssVarChevroned").value = chevronedColour
+
+      cssVarUpdate.setProperty("--header-colour", sett.headerColour)
+      headerColour = sett.headerColour
+      document.getElementById("cssVarHeader").value = headerColour
+
+      cssVarUpdate.setProperty("--selected-day-colour", sett.selectedDayColour)
+      selectedDayColour = sett.selectedDayColour
+      document.getElementById("cssVarSelected").value = selectedDayColour
+
+      cssVarUpdate.setProperty("--text-colour", sett.textColour)
+      textColour = sett.textColour
+      document.getElementById("cssVarText").value = textColour
+
+      cssVarUpdate.setProperty("--today-colour", sett.todayColour)
+      todayColour = sett.todayColour
+      document.getElementById("cssVarToday").value = todayColour
+
+      cssVarUpdate.setProperty("--today-text-colour", sett.todayTextColour)
+      todayTextColour = sett.todayTextColour
+      document.getElementById("cssVarTodayText").value = todayTextColour
 
       //TASKS
       tasks = data.tasks;
@@ -233,6 +277,47 @@ function isToday(day) {
     dataLoaded.value = true
   }
 
+  function resetToDefaultColours() {
+    const cssVarUpdate = document.documentElement.style
+
+    cssVarUpdate.setProperty("--background-colour", "#181818")
+    backgroundColour = "#181818"
+    document.getElementById("cssVarBG").value = backgroundColour
+
+    cssVarUpdate.setProperty("--calendar-colour", "#424242")
+      calendarColour = "#424242"
+      document.getElementById("cssVarCalendar").value = calendarColour
+      
+      cssVarUpdate.setProperty("--other-month-text-colour", "#888888")
+      otherMonthTextColour = "#888888"
+      document.getElementById("cssVarOtherMonthText").value = otherMonthTextColour
+      
+      cssVarUpdate.setProperty("--chevroned-colour", "#3a3a3a")
+      chevronedColour = "#3a3a3a"
+      document.getElementById("cssVarChevroned").value = chevronedColour
+
+      cssVarUpdate.setProperty("--header-colour", "#343434")
+      headerColour = "#343434"
+      document.getElementById("cssVarHeader").value = headerColour
+
+      cssVarUpdate.setProperty("--selected-day-colour", "#757575")
+      selectedDayColour = "#757575"
+      document.getElementById("cssVarSelected").value = selectedDayColour
+
+      cssVarUpdate.setProperty("--text-colour", "#b1b1b1")
+      textColour = "#b1b1b1"
+      document.getElementById("cssVarText").value = textColour
+
+      cssVarUpdate.setProperty("--today-colour", "#adadad")
+      todayColour = "#adadad"
+      document.getElementById("cssVarToday").value = todayColour
+
+      cssVarUpdate.setProperty("--today-text-colour", "#0a0a0a")
+      todayTextColour = "#0a0a0a"
+      document.getElementById("cssVarTodayText").value = todayTextColour
+
+    updateTheme();
+
   function signOutUser(){
     const auth = getAuth()
     signOut(auth)
@@ -243,6 +328,7 @@ function isToday(day) {
         }).catch((error)=>{
             console.error("Sign out error: ", error)
     })
+
 
   }
 
@@ -355,8 +441,8 @@ function isToday(day) {
     </div>
 
     <div id="settingsHidden" class="hidden settingsClass">
-      <span>Colour:</span>
-     <input
+    <span>Background:</span>
+    <input
       type="color" 
       id="cssVarBG"
       v-model="backgroundColour"
@@ -364,37 +450,141 @@ function isToday(day) {
       @change="updateSetting('backgroundColour', backgroundColour)"
       style="
       width: 2vw;
-      height: 4.5vh;
+      height: 2vw;
       border: none;
       background: none;
       cursor: pointer;
       "
-    >
+    > <br>
+    <span>Calendar:</span>
     <input
       type="color" 
-      id="cssVarCalendarC"
+      id="cssVarCalendar"
       v-model="calendarColour"
       @input="updateTheme()"
       @change="updateSetting('calendarColour', calendarColour)"
       style="
       width: 2vw;
-      height: 4.5vh;
+      height: 2vw;
       border: none;
       background: none;
       cursor: pointer;
       "
-    >
+    > <br>
+    <span>Today:</span>
+    <input
+      type="color" 
+      id="cssVarToday"
+      v-model="todayColour"
+      @input="updateTheme()"
+      @change="updateSetting('todayColour', todayColour)"
+      style="
+      width: 2vw;
+      height: 2vw;
+      border: none;
+      background: none;
+      cursor: pointer;
+      "
+    > <br>
+    <span>Chosen Day:</span>
+    <input
+      type="color" 
+      id="cssVarSelected"
+      v-model="selectedDayColour"
+      @input="updateTheme()"
+      @change="updateSetting('selectedDayColour', selectedDayColour)"
+      style="
+      width: 2vw;
+      height: 2vw;
+      border: none;
+      background: none;
+      cursor: pointer;
+      "
+    > <br>
+    <span>Tabs:</span>
+    <input
+      type="color" 
+      id="cssVarChevroned"
+      v-model="chevronedColour"
+      @input="updateTheme()"
+      @change="updateSetting('chevronedColour', chevronedColour)"
+      style="
+      width: 2vw;
+      height: 2vw;
+      border: none;
+      background: none;
+      cursor: pointer;
+      ">
+      <br>
+    <span>Header:</span>
+    <input
+      type="color" 
+      id="cssVarHeader"
+      v-model="headerColour"
+      @input="updateTheme()"
+      @change="updateSetting('headerColour', headerColour)"
+      style="
+      width: 2vw;
+      height: 2vw;
+      border: none;
+      background: none;
+      cursor: pointer;
+      "
+    > <br>
+    <span>Text:</span>
+    <input
+      type="color" 
+      id="cssVarText"
+      v-model="textColour"
+      @input="updateTheme()"
+      @change="updateSetting('textColour', textColour)"
+      style="
+      width: 2vw;
+      height: 2vw;
+      border: none;
+      background: none;
+      cursor: pointer;
+      "
+    > <br>
+    <span>Today's Text:</span>
+    <input
+      type="color" 
+      id="cssVarTodayText"
+      v-model="todayTextColour"
+      @input="updateTheme()"
+      @change="updateSetting('todayTextColour', todayTextColour)"
+      style="
+      width: 2vw;
+      height: 2vw;
+      border: none;
+      background: none;
+      cursor: pointer;
+      "
+    > <br>
+    <span>Extra Days:</span>
+    <input
+      type="color" 
+      id="cssVarOtherMonthText"
+      v-model="otherMonthTextColour"
+      @input="updateTheme()"
+      @change="updateSetting('otherMonthTextColour', otherMonthTextColour)"
+      style="
+      width: 2vw;
+      height: 2vw;
+      border: none;
+      background: none;
+      cursor: pointer;
+      "
+    > <br>
+    <button @click="resetToDefaultColours()">Reset to Default</button>
+ 
+    
     <button
       @click="signOutUser(router)"
       style="
       width: 2vw;
-      height: 4.5vh;
-      border: none;
-      background: none;
-      cursor: pointer;
-      "
-    > 
-    Sign Out
+      height: 4.5vh;>
+      Sign Out
     </button>
     </div>
 
