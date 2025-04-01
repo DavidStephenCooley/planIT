@@ -4,7 +4,7 @@ import app from "../api/firebase"
 import { useRouter } from 'vue-router'
 import { getAuth, createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import handleError from "../components/loginAndRegFunctions/errorHandler";
-import { addUser, getUserData } from "../components/loginAndRegFunctions/createUserFunctions";
+
 
 // Form values
 const username = ref("");
@@ -60,7 +60,7 @@ function register(){
       <div class="separator-line"></div>
     </div>
 
-    <button class="auth-link google-login">Sign Up with Google</button>
+  
     <button class="auth-link" @click="router.push('/login')">Sign In with Email</button>
   </div>
 </template>

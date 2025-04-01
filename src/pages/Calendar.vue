@@ -1,7 +1,11 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
+import { getAuth, signOut } from 'firebase/auth';
+import { useRouter } from 'vue-router';
 import '@/assets/global.css'
-import { updateSetting, getUserData, addToTasks } from "../components/databaseFunctions/userDataFunctions"
+import { updateSetting, getUserData, addToTasks, setAllSettings } from "../components/databaseFunctions/userDataFunctions"
+
+const router = useRouter()
 
 const today = new Date();
 const currentMonth = ref(today.getMonth());
@@ -32,7 +36,6 @@ let tasksDict = []
 
 function getTasksForDate(day, isCurrentMonth){
   let ind = currentYear.value + "-" + (currentMonth.value<10?"0":"")+(currentMonth.value+1) + "-" + (day<10?"0":"") + day
-  console.log(ind, tasksDict[ind])
   if(isCurrentMonth)
   return tasksDict[ind]
   return null
@@ -40,7 +43,6 @@ function getTasksForDate(day, isCurrentMonth){
 
 async function refreshTaskPreviews() {
   dataLoaded.value=false;
-  console.log(tasksDict)
   setTimeout(()=>{dataLoaded.value=true}, 1)
 }
 
@@ -146,6 +148,7 @@ function isToday(day) {
     currentYear.value === today.getFullYear()
   );
 }
+
   function addDate(dayObj) {
   let month = currentMonth.value;
   let year = currentYear.value;
@@ -289,7 +292,24 @@ function isToday(day) {
       todayTextColour = "#0a0a0a"
       document.getElementById("cssVarTodayText").value = todayTextColour
 
+      setAllSettings({backgroundColour: "#181818", calendarColour: "#424242", todayColour: "#adadad", selectedDayColour: "#757575", 
+      chevronedColour: "#3a3a3a", headerColour: "#343434", textColour: "#b1b1b1", todayTextColour:"#0a0a0a", otherMonthTextColour:"#888888"})
+
     updateTheme();
+  }
+
+  function signOutUser(){
+    const auth = getAuth()
+    signOut(auth)
+        .then(()=> {
+            console.log("wudup")
+            router.push({path:"/"})
+             //Sign out success, then route to back to login page? Or just update whether signed in or not
+        }).catch((error)=>{
+            console.error("Sign out error: ", error)
+    })
+
+
   }
 
   function collectTaskData(){
@@ -304,6 +324,14 @@ function isToday(day) {
       taskColour: document.getElementById("taskColour").value
     }
 
+    const thing = document.getElementById("date").value
+    console.log("taks",tasksDict[date])
+    if(tasksDict[thing] != undefined){
+      tasksDict[thing].push(taskData)
+    }else{
+      tasksDict[thing] = [taskData]
+    }
+    refreshTaskPreviews()
     return taskData;
 
   }
@@ -509,7 +537,15 @@ function isToday(day) {
       @input="updateTheme()"
       @change="updateSetting('chevronedColour', chevronedColour)"
       
-    > <br>
+      style="
+      width: 2vw;
+      height: 2vw;
+      border: none;
+      background: none;
+      cursor: pointer;
+      ">
+      <br>
+
     <span>Header:</span>
     <input
       type="color"
@@ -551,6 +587,15 @@ function isToday(day) {
       
     > <br>
     <button @click="resetToDefaultColours()">Reset to Default</button>
+    
+    <button
+      @click="signOutUser(router)"
+      style="
+      width: 2vw;
+      height: 4.5vh;">
+      Sign Out
+    </button>
+
     </div>
 
 
@@ -562,10 +607,12 @@ function isToday(day) {
     </div>
     <div id="newTaskHidden" class="hidden newTaskButton">
       <input type="text" id="title" placeholder="Title"><br>
+
       <input type="date" id="date" @click="dateUpdate(1)"><br>
       <input type="checkbox" id="isRepeating" 
       @click="repeatingClick()"><label>Repeating</label><br>
       <div id="repeatingText">
+
         <label>Every</label><input type="number" placeholder="Number of">
         <select id = "repeatType">
           <option value="days">Days</option>
@@ -573,6 +620,7 @@ function isToday(day) {
           <option value="months">Months</option>
           <option value="years">Years</option>
         </select><br>
+
         <input type="checkbox" @click="foreverClick(1)"id="forever" checked="true"><label>Forever</label>
         <input type="checkbox" @click="foreverClick(2)"id="until"><label>Until</label><br>
         <input type="date" id="dateUntil" @click="dateUpdate(2)"><br>
@@ -580,6 +628,7 @@ function isToday(day) {
       <input type="text" id="taskDescription" placeholder="Add description...">
       <label>Colour</label><input type="color" id="taskColour"><br>
       <button @click="addToTasks(collectTaskData())">SAVE</button>
+
     </div>
   </main>
 </template>
@@ -772,6 +821,10 @@ td:hover {
 #newTaskHidden select:focus {
   border-color: #4a90e2;
   outline: none;
+}
+
+.nohighlight {
+  user-select: none;
 }
 
 /* Checkbox styling */
