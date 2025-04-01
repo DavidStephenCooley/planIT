@@ -6,9 +6,9 @@
     --selected-day-colour: #757575;
     --chevroned-colour: #3a3a3a;
     --header-colour: #343434;
-    --text-colour: rgb(177, 177, 177);
-    --today-text-colour: rgb(10,10,10);
-    --other-month-text-colour: #888;
+    --text-colour: #b1b1b1;
+    --today-text-colour: #0a0a0a;
+    --other-month-text-colour: #888888;
   }
 
   body {
