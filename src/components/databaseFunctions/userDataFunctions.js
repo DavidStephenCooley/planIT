@@ -22,7 +22,7 @@ export async function addToEvents(event){
 
 export async function removeFromEvents(event){
     try {
-        
+        await updateDoc(getUserDoc(), {events: arrayRemove(event)})
     } catch (error) {
         console.error("Something went wrong:", error)
     }
