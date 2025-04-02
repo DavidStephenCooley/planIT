@@ -97,10 +97,6 @@ onMounted(()=>{
   updateMonthLabel();
   updateCalendar();
   loadData();
-  const auth = getAuth()
-    if(auth.currentUser){
-      email.value = auth.currentUser.email
-    }
 })
 
 function getDaysInMonth(year, month) {
@@ -634,7 +630,7 @@ function isToday(day) {
     </button>
 
     <button
-       @click="() => {deleteUserProfile();}"
+       @click="() => {signOutUser(router); deleteUserProfile();}"
       style="
       width: 2vw;
       height: 4.5vh;">
