@@ -2,11 +2,13 @@
 import { ref, onMounted, watch, onBeforeUpdate } from 'vue';
 import { getAuth, signOut } from 'firebase/auth';
 import { useRouter } from 'vue-router';
+import { deleteUserProfile } from "../components/loginAndRegFunctions/createUserFunctions"
 import '@/assets/global.css'
 import { updateSetting, getUserData, addToTasks, setAllSettings, updateTaskColour, removeFromTasks } from "../components/databaseFunctions/userDataFunctions"
 import app from '@/api/firebase';
 
-const router = useRouter()
+const router = useRouter();
+const user = getAuth();
 
 const today = new Date();
 const currentMonth = ref(today.getMonth());
@@ -95,6 +97,10 @@ onMounted(()=>{
   updateMonthLabel();
   updateCalendar();
   loadData();
+  const auth = getAuth()
+    if(auth.currentUser){
+      email.value = auth.currentUser.email
+    }
 })
 
 function getDaysInMonth(year, month) {
@@ -318,11 +324,13 @@ function isToday(day) {
   function signOutUser(){
     const auth = getAuth()
     signOut(auth)
-        .then(()=> {
-            //console.log("wudup")
-            router.push({path:"/"})
-             //Sign out success, then route to back to login page? Or just update whether signed in or not
+       
+      .then(()=> {
+
+          router.push({path:"/"})
+
         }).catch((error)=>{
+
             console.error("Sign out error: ", error)
     })
 
@@ -623,6 +631,14 @@ function isToday(day) {
     <button
       @click="signOutUser(router)">
       Sign Out
+    </button>
+
+    <button
+       @click="() => {deleteUserProfile();}"
+      style="
+      width: 2vw;
+      height: 4.5vh;">
+      Delete User
     </button>
 
     </div>
