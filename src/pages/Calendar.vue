@@ -42,20 +42,52 @@ const currentDayTasks = ref([]);
 function toStringfromDay(day){
   if(day != undefined){
     const month = (!day.isCurrentMonth)?((day.day > 15)? currentMonth.value-1 : currentMonth.value+1):(currentMonth.value)
-    return currentYear.value + "-" + (month<10?"0":"")+(month+1) + "-" + (day.day<10?"0":"") + day.day
+    return currentYear.value + "-" + (month+1<10?"0":"")+(month+1) + "-" + (day.day<10?"0":"") + day.day
   }
 
 }
 
 function selectDay(day){
     selectedDay = day
-    currentDayTasks.value = tasksDict[toStringfromDay(selectedDay)]
+    currentDayTasks.value = getTasksForDate(day)
 }
 
 function getTasksForDate(day){
   let ind = toStringfromDay(day)
-  console.log(ind)
-  return tasksDict[ind]
+  let out = []
+  if(tasksDict[ind]){
+    Object.assign(out, tasksDict[ind])
+  }
+    //console.log("whats good pluh", out)
+      for(const [key, t] of Object.entries(tasksDict)){
+        for(const b of t){
+          //console.log(b)
+          if(!b.isRepeating)continue //skip non repeating
+          const d1 = new Date(ind)
+          const d2 = new Date(key)
+          const diff = (d2 - d1)/ 86400000
+          //console.log(t)
+          //console.log(Math.abs(diff % 2) == 0 )
+          const mult = (b.repeatType == "days")?1:((b.repeatType == "weeks")?7:((b.repeatType == "months")?30:((b.repeatType == "years")?365:0)))
+          //console.log(mult)
+
+          if(!(b.date == ind)){
+            if(Math.abs(((d2 - d1) / 86400000 ) % (b.repeatNumber*mult)) == 0){
+              //console.log("out", out)
+              if(out == undefined){
+                Object.assign(out, b)
+              }else{
+                out.push(b)
+              }
+              
+            }
+          }
+          
+        }
+      }
+      console.log(ind, out)
+      return out
+
 }
 
 async function refreshTaskPreviews() {
@@ -342,8 +374,9 @@ function isToday(day) {
       id: generateRandomID(),
       title: document.getElementById("title").value,
       date: document.getElementById("date").value,
-      isRepeating: document.getElementById("isRepeating").value || null,
+      isRepeating: repeatingCheck,
       repeatType: document.getElementById("repeatType").value,
+      repeatNumber: parseInt(document.getElementById("repeatNumber").value) || null,
       forever: document.getElementById("forever").value,
       until: document.getElementById("until").value,
       dateUntil: document.getElementById("dateUntil").value || null,
@@ -676,7 +709,7 @@ function isToday(day) {
       @click="repeatingClick()"><label>Repeating</label><br>
       <div id="repeatingText">
 
-        <label>Every</label><input type="number" placeholder="Number of">
+        <label>Every</label><input id="repeatNumber" type="number" placeholder="Number of">
         <select id = "repeatType">
           <option value="days">Days</option>
           <option value="weeks">Weeks</option>
