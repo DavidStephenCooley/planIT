@@ -40,7 +40,7 @@ const currentDayTasks = ref([]);
 function toStringfromDay(day){
   if(day != undefined){
     const month = (!day.isCurrentMonth)?((day.day > 15)? currentMonth.value-1 : currentMonth.value+1):(currentMonth.value)
-    return currentYear.value + "-" + (month<10?"0":"")+(month+1) + "-" + (day<10?"0":"") + day.day
+    return currentYear.value + "-" + (month<10?"0":"")+(month+1) + "-" + (day.day<10?"0":"") + day.day
   }
 
 }
@@ -511,9 +511,9 @@ function isToday(day) {
                 {{ day.day }}
                 <div class="taskPreviewContainer">
 
-                  <div id="taskPreview" v-if="dataLoaded" v-for="(box,index) in getTasksForDate(day.day, day.isCurrentMonth)" :key="dataLoaded" :style="{backgroundColor:box.taskColour}"> 
+                  <div id="taskPreview" v-if="dataLoaded" v-for="(box,index) in getTasksForDate(day)" :key="dataLoaded" :style="{backgroundColor:box.taskColour}"> 
                     <div id="taskPreviewText" >
-                    {{ (getTasksForDate(day.day, day.isCurrentMonth).length < 5)?(box.title):("") }}
+                    {{ (getTasksForDate(day).length < 5)?(box.title):("") }}
                     </div>
                   </div>
 
