@@ -3,7 +3,7 @@ import { ref, onMounted, watch, onBeforeUpdate } from 'vue';
 import { getAuth, signOut } from 'firebase/auth';
 import { useRouter } from 'vue-router';
 import '@/assets/global.css'
-import { updateSetting, getUserData, addToTasks, setAllSettings } from "../components/databaseFunctions/userDataFunctions"
+import { updateSetting, getUserData, addToTasks, setAllSettings, updateTask } from "../components/databaseFunctions/userDataFunctions"
 import app from '@/api/firebase';
 
 const router = useRouter()
@@ -34,11 +34,25 @@ let otherMonthTextColour;
 const dataLoaded = ref(false)
 let tasks = []
 let tasksDict = []
+let selectedDay;
+const currentDayTasks = ref([]);
 
-function getTasksForDate(day, isCurrentMonth){
-  const month = (!isCurrentMonth)?((day > 15)? currentMonth.value-1 : currentMonth.value+1):(currentMonth.value)
+function toStringfromDay(day){
+  if(day != undefined){
+    const month = (!day.isCurrentMonth)?((day.day > 15)? currentMonth.value-1 : currentMonth.value+1):(currentMonth.value)
+    return currentYear.value + "-" + (month<10?"0":"")+(month+1) + "-" + (day<10?"0":"") + day.day
+  }
 
-  let ind = currentYear.value + "-" + (month<10?"0":"")+(month+1) + "-" + (day<10?"0":"") + day
+}
+
+function selectDay(day){
+    selectedDay = day
+    currentDayTasks.value = tasksDict[toStringfromDay(selectedDay)]
+}
+
+function getTasksForDate(day){
+  let ind = toStringfromDay(day)
+  console.log(ind)
   return tasksDict[ind]
 }
 
@@ -315,8 +329,13 @@ function isToday(day) {
 
   }
 
+  function generateRandomID(){
+    return Math.random().toString(32).substring(2)
+  }
+
   function collectTaskData(){
     let taskData = {
+      id: generateRandomID(),
       title: document.getElementById("title").value,
       date: document.getElementById("date").value,
       isRepeating: document.getElementById("isRepeating").value || null,
@@ -324,7 +343,8 @@ function isToday(day) {
       forever: document.getElementById("forever").value,
       until: document.getElementById("until").value,
       dateUntil: document.getElementById("dateUntil").value || null,
-      taskColour: document.getElementById("taskColour").value
+      taskColour: document.getElementById("taskColour").value,
+      description: document.getElementById("taskDescription").value || null
     }
 
     const thing = document.getElementById("date").value
@@ -480,7 +500,7 @@ function isToday(day) {
         <table id="monthVue">
           <tbody>
             <tr v-for="(week, weekIndex) in calendar" :key="weekIndex">
-              <td class="calanderDay" @click="popoutViewTask(true); addDate(day)" v-on:dblclick="popoutNewTask(true)"
+              <td class="calanderDay" @click="popoutViewTask(true); addDate(day); selectDay(day)" v-on:dblclick="popoutNewTask(true)"
                 v-for="(day, dayIndex) in week" 
                 :key="dayIndex" 
                 :class="{ 
@@ -490,11 +510,13 @@ function isToday(day) {
                 >
                 {{ day.day }}
                 <div class="taskPreviewContainer">
+
                   <div id="taskPreview" v-if="dataLoaded" v-for="(box,index) in getTasksForDate(day.day, day.isCurrentMonth)" :key="dataLoaded" :style="{backgroundColor:box.taskColour}"> 
                     <div id="taskPreviewText" >
                     {{ (getTasksForDate(day.day, day.isCurrentMonth).length < 5)?(box.title):("") }}
                     </div>
                   </div>
+
                 </div>
              </td>
             </tr>
@@ -615,12 +637,14 @@ function isToday(day) {
     </div>
     
     <!--  THIS WILL NEED TO BE A COMPONENT OR SOMETHING BECAUSE IT NEEDS TO BE REPEATED FOR EACH TASK ON A GIVEN DAY  -->
-    <div id="taskViewHidden" class="hidden taskViewButton">
-      <span id="taskViewTitle">Today</span>
-      <div id="taskViewTheThingThatRepeats">
-        <input type="color" id="taskViewColor">
-        <span id="taskViewName">Task</span>
-        <textarea type="text" id="taskViewDescription" value="THETASKSDEFAULTDESCRIPTION"></textarea>
+    <div id="taskViewHidden" class="hidden taskViewButton" >
+      <div class="taskDetails" v-for="task in currentDayTasks">
+        <span id="taskViewTitle">Today</span>
+        <div id="taskViewTheThingThatRepeats">
+          <input type="color" id="taskViewColor" v-model="task.taskColour" @input="updateTask(task)">
+          <span id="taskViewName">{{task.title}}</span>
+          <textarea type="text" id="taskViewDescription" v-model="task.description"></textarea>
+        </div>
       </div>
     </div>
 
@@ -684,6 +708,10 @@ table {
 
 .box {
   position: absolute;
+}
+
+.taskDetails{
+  background-color: rgb(0, 0, 0);
 }
 
 
