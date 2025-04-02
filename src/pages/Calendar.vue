@@ -373,6 +373,7 @@ function isToday(day) {
       viewTaskOpen = !viewTaskOpen;
     }
     let button = document.getElementById("taskViewButton");
+    let inputs = document.getElementById("taskViewHidden");
     if (viewTaskOpen) {
       if (settingsOpen) {
         popoutSettings();
@@ -381,11 +382,13 @@ function isToday(day) {
       button.style.width = "18vw";
       button.style.justifyContent = "right";
       document.getElementById("viewTaskChevron").style.transform = "rotate(180deg)";
+      inputs.style.left = "0vh"
     } else {
       button.style.height = "8vh";
       button.style.width = "3vw";
       button.style.justifyContent = "center";
       document.getElementById("viewTaskChevron").style.transform = "rotate(0deg)";
+      inputs.style.left = "-100vh"
     }
   }
     function popoutSettings() {
@@ -491,7 +494,7 @@ function isToday(day) {
     </div>
 
     <div id="settingsHidden" class="hidden settingsClass">
-    <span>Background:</span>
+    <label class="settingslabels" >Background:</label>
     <input
       type="color" 
       class="settingsColor"
@@ -501,7 +504,7 @@ function isToday(day) {
       @change="updateSetting('backgroundColour', backgroundColour)"
     
     > <br>
-    <span>Calendar:</span>
+    <label class="settingslabels" >Calendar:</label>
     <input
       type="color" 
       class="settingsColor"
@@ -511,7 +514,7 @@ function isToday(day) {
       @change="updateSetting('calendarColour', calendarColour)"
       
     > <br>
-    <span>Today:</span>
+    <label class="settingslabels" >Today:</label>
     <input
       type="color" 
       class="settingsColor"
@@ -521,7 +524,7 @@ function isToday(day) {
       @change="updateSetting('todayColour', todayColour)"
       
     > <br>
-    <span>Chosen Day:</span>
+    <label class="settingslabels" >Chosen Day:</label>
     <input
       type="color" 
       class="settingsColor"
@@ -531,7 +534,7 @@ function isToday(day) {
       @change="updateSetting('selectedDayColour', selectedDayColour)"
       
     > <br>
-    <span>Tabs:</span>
+    <label class="settingslabels" >Tabs:</label>
     <input
       type="color" 
       class="settingsColor"
@@ -539,17 +542,8 @@ function isToday(day) {
       v-model="chevronedColour"
       @input="updateTheme()"
       @change="updateSetting('chevronedColour', chevronedColour)"
-      
-      style="
-      width: 2vw;
-      height: 2vw;
-      border: none;
-      background: none;
-      cursor: pointer;
-      ">
-      <br>
-
-    <span>Header:</span>
+      > <br>
+    <label class="settingslabels" >Header:</label>
     <input
       type="color"
       class="settingsColor"
@@ -559,7 +553,7 @@ function isToday(day) {
       @change="updateSetting('headerColour', headerColour)"
       
     > <br>
-    <span>Text:</span>
+    <label class="settingslabels" >Text:</label>
     <input
       type="color" 
       class="settingsColor"
@@ -569,7 +563,7 @@ function isToday(day) {
       @change="updateSetting('textColour', textColour)"
       
     > <br>
-    <span>Today's Text:</span>
+    <label class="settingslabels" >Today's Text:</label>
     <input
       type="color" 
       class="settingsColor"
@@ -579,7 +573,7 @@ function isToday(day) {
       @change="updateSetting('todayTextColour', todayTextColour)"
       
     > <br>
-    <span>Extra Days:</span>
+    <label class="settingslabels" >Extra Days:</label>
     <input
       type="color" 
       class="settingsColor"
@@ -592,19 +586,28 @@ function isToday(day) {
     <button @click="resetToDefaultColours()">Reset to Default</button>
     
     <button
-      @click="signOutUser(router)"
-      style="
-      width: 2vw;
-      height: 4.5vh;">
+      @click="signOutUser(router)">
       Sign Out
     </button>
 
     </div>
 
 
-    <div id="taskViewButton" class="sidebutton">
+    <div id="taskViewButton" class="taskViewButton sidebutton">
       <span @click="popoutViewTask(false)" class="material-symbols-outlined" id="viewTaskChevron">arrow_forward_ios</span>
     </div>
+    
+    <!--  THIS WILL NEED TO BE A COMPONENT OR SOMETHING BECAUSE IT NEEDS TO BE REPEATED FOR EACH TASK ON A GIVEN DAY  -->
+    <div id="taskViewHidden" class="hidden taskViewButton">
+      <span id="taskViewTitle">Today</span>
+      <div id="taskViewTheThingThatRepeats">
+        <input type="color" id="taskViewColor">
+        <span id="taskViewName">Task</span>
+        <textarea type="text" id="taskViewDescription" value="THETASKSDEFAULTDESCRIPTION"></textarea>
+      </div>
+    </div>
+
+
     <div id="newTaskButton" class="newTaskButton sidebutton">
       <span  @click="popoutNewTask(false)" class="material-symbols-outlined" id="add">add</span>
     </div>
@@ -787,14 +790,18 @@ td:hover {
   left: 1vw;
 }
 
-.SettingsColor {
-  width: 1vw;
-  height: 1vw;
+.settingslabels {
+  margin: 2vh;
+}
+
+.settingsColor {
+  width: 2vw;
+  height: 2vw;
   border: none;
   background: none;
   cursor: pointer;
-  margin-left: 0vw;
-  vertical-align: middle;
+  position: absolute;
+  right: 8vw;
 }
 
 #newTaskHidden {
@@ -805,6 +812,15 @@ td:hover {
   padding: 1vw;
   background: transparent;
 }
+
+#taskViewColor {
+  -webkit-appearance: none; /* Reset default styles */
+  -moz-appearance: none;
+  width: 1.5vw;
+  height: 1.5vw;
+  background: none;
+
+} 
 
 /* Input field styling */
 #newTaskHidden input[type="text"],
@@ -822,7 +838,7 @@ td:hover {
 #newTaskHidden input[type="date"]:focus,
 #newTaskHidden input[type="number"]:focus,
 #newTaskHidden select:focus {
-  border-color: #4a90e2;
+
   outline: none;
 }
 
@@ -834,7 +850,6 @@ td:hover {
 #newTaskHidden input[type="checkbox"] {
   margin-right: 0.5vw;
   margin-left: 0.5vw;
-  accent-color: #4a90e2;
 }
 
 /* Label styling */
@@ -886,10 +901,6 @@ td:hover {
   transition: background-color 0.3s;
 }
 
-#newTaskHidden button:hover {
-  background-color: #3a7bc8;
-}
-
 /* Responsive adjustments */
 @media (max-width: 400px) {
   #newTaskHidden {
@@ -904,6 +915,15 @@ td:hover {
   transform: translateY(-50%);
   border-top-right-radius: 1vw;
   border-bottom-right-radius: 1vw;
+}
+
+#taskViewHidden {
+  position: fixed;
+  height: 75vh;
+  width: 34vh;
+  right: -100vw;
+  padding: 1vw;
+  background: transparent;
 }
 
 .newTaskButton {
