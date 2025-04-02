@@ -1,6 +1,6 @@
 import { getFirestore, setDoc, collection, getDoc, doc, updateDoc, arrayUnion, arrayRemove, query, where} from "firebase/firestore";
 import app from "@/api/firebase";
-import { getAuth, signOut } from "firebase/auth"
+import { getAuth, onAuthStateChanged } from "firebase/auth"
 
 const db = getFirestore(app,"database1")
 
