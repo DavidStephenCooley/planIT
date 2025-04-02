@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import app from "../api/firebase"
 import { useRouter } from 'vue-router'
 import { getAuth, createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
@@ -12,6 +12,16 @@ const email = ref("")
 const password = ref("");
 const error = ref("");
 const router = useRouter() // gets the router
+
+onMounted(() => { // Allows user to press enter instead of needing to press the login button
+  const loginButton =  document.querySelectorAll('.input-field').forEach((inp)=>{
+    inp.addEventListener("keypress", function (event) {
+      if (event.key === "Enter") {
+        validateForm(event);
+      }
+    });
+  })
+});
 
 // Validation function
 const validateForm = (event) => {
