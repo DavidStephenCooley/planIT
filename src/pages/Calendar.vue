@@ -2,9 +2,9 @@
 import { ref, onMounted, watch, onBeforeUpdate } from 'vue';
 import { getAuth, signOut } from 'firebase/auth';
 import { useRouter } from 'vue-router';
-import '@/assets/global.css';
-import { updateSetting, getUserData, addToTasks, setAllSettings } from "../components/databaseFunctions/userDataFunctions";
 import { deleteUserProfile } from "../components/loginAndRegFunctions/createUserFunctions"
+import '@/assets/global.css'
+import { updateSetting, getUserData, addToTasks, setAllSettings, updateTaskColour, removeFromTasks } from "../components/databaseFunctions/userDataFunctions"
 import app from '@/api/firebase';
 
 const router = useRouter();
@@ -36,12 +36,26 @@ let otherMonthTextColour;
 const dataLoaded = ref(false)
 let tasks = []
 let tasksDict = []
+let selectedDay;
+const currentDayTasks = ref([]);
 
-function getTasksForDate(day, isCurrentMonth){
-  let ind = currentYear.value + "-" + (currentMonth.value<10?"0":"")+(currentMonth.value+1) + "-" + (day<10?"0":"") + day
-  if(isCurrentMonth)
+function toStringfromDay(day){
+  if(day != undefined){
+    const month = (!day.isCurrentMonth)?((day.day > 15)? currentMonth.value-1 : currentMonth.value+1):(currentMonth.value)
+    return currentYear.value + "-" + (month<10?"0":"")+(month+1) + "-" + (day.day<10?"0":"") + day.day
+  }
+
+}
+
+function selectDay(day){
+    selectedDay = day
+    currentDayTasks.value = tasksDict[toStringfromDay(selectedDay)]
+}
+
+function getTasksForDate(day){
+  let ind = toStringfromDay(day)
+  console.log(ind)
   return tasksDict[ind]
-  return null
 }
 
 async function refreshTaskPreviews() {
@@ -323,8 +337,13 @@ function isToday(day) {
 
   }
 
+  function generateRandomID(){
+    return Math.random().toString(32).substring(2)
+  }
+
   function collectTaskData(){
     let taskData = {
+      id: generateRandomID(),
       title: document.getElementById("title").value,
       date: document.getElementById("date").value,
       isRepeating: document.getElementById("isRepeating").value || null,
@@ -332,7 +351,8 @@ function isToday(day) {
       forever: document.getElementById("forever").value,
       until: document.getElementById("until").value,
       dateUntil: document.getElementById("dateUntil").value || null,
-      taskColour: document.getElementById("taskColour").value
+      taskColour: document.getElementById("taskColour").value,
+      description: document.getElementById("taskDescription").value || null
     }
 
     const thing = document.getElementById("date").value
@@ -381,6 +401,7 @@ function isToday(day) {
       viewTaskOpen = !viewTaskOpen;
     }
     let button = document.getElementById("taskViewButton");
+    let inputs = document.getElementById("taskViewHidden");
     if (viewTaskOpen) {
       if (settingsOpen) {
         popoutSettings();
@@ -389,11 +410,13 @@ function isToday(day) {
       button.style.width = "18vw";
       button.style.justifyContent = "right";
       document.getElementById("viewTaskChevron").style.transform = "rotate(180deg)";
+      inputs.style.left = "0vh"
     } else {
       button.style.height = "8vh";
       button.style.width = "3vw";
       button.style.justifyContent = "center";
       document.getElementById("viewTaskChevron").style.transform = "rotate(0deg)";
+      inputs.style.left = "-100vh"
     }
   }
     function popoutSettings() {
@@ -452,6 +475,15 @@ function isToday(day) {
   }
   }
 
+  function checkIfLessThanTwentyEightTasksAlreadyThere() {
+    const elem = document.getElementById("date").value;
+    console.log(elem);
+    if (tasksDict[elem] == undefined || tasksDict[elem].length < 16) {
+      addToTasks(collectTaskData())
+    } else {
+      alert("You already have 16 tasks on this day.");
+    }
+  }
 
 </script>
 
@@ -476,7 +508,7 @@ function isToday(day) {
         <table id="monthVue">
           <tbody>
             <tr v-for="(week, weekIndex) in calendar" :key="weekIndex">
-              <td class="calanderDay" @click="popoutViewTask(true); addDate(day)" v-on:dblclick="popoutNewTask(true)"
+              <td class="calanderDay" @click="popoutViewTask(true); addDate(day); selectDay(day)" v-on:dblclick="popoutNewTask(true)"
                 v-for="(day, dayIndex) in week" 
                 :key="dayIndex" 
                 :class="{ 
@@ -486,7 +518,13 @@ function isToday(day) {
                 >
                 {{ day.day }}
                 <div class="taskPreviewContainer">
-                  <div class="taskPreview" v-if="dataLoaded" v-for="box in getTasksForDate(day.day, day.isCurrentMonth)" :key="dataLoaded" :style="{backgroundColor:box.taskColour}"> {{ box.title }} </div>
+
+                  <div id="taskPreview" v-if="dataLoaded" v-for="(box,index) in getTasksForDate(day)" :key="dataLoaded" :style="{backgroundColor:box.taskColour}"> 
+                    <div id="taskPreviewText" >
+                    {{ (getTasksForDate(day).length < 5)?(box.title):("") }}
+                    </div>
+                  </div>
+
                 </div>
              </td>
             </tr>
@@ -499,7 +537,7 @@ function isToday(day) {
     </div>
 
     <div id="settingsHidden" class="hidden settingsClass">
-    <span>Background:</span>
+    <label class="settingslabels" >Background:</label>
     <input
       type="color" 
       class="settingsColor"
@@ -509,7 +547,7 @@ function isToday(day) {
       @change="updateSetting('backgroundColour', backgroundColour)"
     
     > <br>
-    <span>Calendar:</span>
+    <label class="settingslabels" >Calendar:</label>
     <input
       type="color" 
       class="settingsColor"
@@ -519,7 +557,7 @@ function isToday(day) {
       @change="updateSetting('calendarColour', calendarColour)"
       
     > <br>
-    <span>Today:</span>
+    <label class="settingslabels" >Today:</label>
     <input
       type="color" 
       class="settingsColor"
@@ -529,7 +567,7 @@ function isToday(day) {
       @change="updateSetting('todayColour', todayColour)"
       
     > <br>
-    <span>Chosen Day:</span>
+    <label class="settingslabels" >Chosen Day:</label>
     <input
       type="color" 
       class="settingsColor"
@@ -539,7 +577,7 @@ function isToday(day) {
       @change="updateSetting('selectedDayColour', selectedDayColour)"
       
     > <br>
-    <span>Tabs:</span>
+    <label class="settingslabels" >Tabs:</label>
     <input
       type="color" 
       class="settingsColor"
@@ -547,17 +585,8 @@ function isToday(day) {
       v-model="chevronedColour"
       @input="updateTheme()"
       @change="updateSetting('chevronedColour', chevronedColour)"
-      
-      style="
-      width: 2vw;
-      height: 2vw;
-      border: none;
-      background: none;
-      cursor: pointer;
-      ">
-      <br>
-
-    <span>Header:</span>
+      > <br>
+    <label class="settingslabels" >Header:</label>
     <input
       type="color"
       class="settingsColor"
@@ -567,7 +596,7 @@ function isToday(day) {
       @change="updateSetting('headerColour', headerColour)"
       
     > <br>
-    <span>Text:</span>
+    <label class="settingslabels" >Text:</label>
     <input
       type="color" 
       class="settingsColor"
@@ -577,7 +606,7 @@ function isToday(day) {
       @change="updateSetting('textColour', textColour)"
       
     > <br>
-    <span>Today's Text:</span>
+    <label class="settingslabels" >Today's Text:</label>
     <input
       type="color" 
       class="settingsColor"
@@ -587,7 +616,7 @@ function isToday(day) {
       @change="updateSetting('todayTextColour', todayTextColour)"
       
     > <br>
-    <span>Extra Days:</span>
+    <label class="settingslabels" >Extra Days:</label>
     <input
       type="color" 
       class="settingsColor"
@@ -600,10 +629,7 @@ function isToday(day) {
     <button @click="resetToDefaultColours()">Reset to Default</button>
     
     <button
-      @click="signOutUser(router)"
-      style="
-      width: 2vw;
-      height: 4.5vh;">
+      @click="signOutUser(router)">
       Sign Out
     </button>
 
@@ -617,15 +643,37 @@ function isToday(day) {
 
     </div>
 
+    <div id="profilePhoto" class="image">
+      <img id="profilePhotoPhoto" src="../assets/profiletest.png">
+    </div>
 
-    <div id="taskViewButton" class="sidebutton">
+
+    <div id="taskViewButton" class="taskViewButton sidebutton">
       <span @click="popoutViewTask(false)" class="material-symbols-outlined" id="viewTaskChevron">arrow_forward_ios</span>
     </div>
+    
+    <!--  THIS WILL NEED TO BE A COMPONENT OR SOMETHING BECAUSE IT NEEDS TO BE REPEATED FOR EACH TASK ON A GIVEN DAY  -->
+    <div id="taskViewHidden" class="hidden taskViewButton">
+      <div class="taskDetails" v-for="task in currentDayTasks">
+        <span id="taskViewTitle">Today</span>
+        <div id="taskViewTheThingThatRepeats">
+          <input type="color" id="taskViewColor" v-model="task.taskColour" @input="updateTaskColour(task)">
+          <span id="taskViewName">{{task.title}}</span>
+          <textarea type="text" id="taskViewDescription" v-model="task.description"></textarea>
+          <button @click="tasksDict[task.date] = tasksDict[task.date].filter(t=>t.id!=task.id);
+                            currentDayTasks = currentDayTasks.filter(t=>t!=task)
+                           removeFromTasks(task);
+                           refreshTaskPreviews();">Delete type shi</button>
+        </div>
+      </div>
+    </div>
+
+
     <div id="newTaskButton" class="newTaskButton sidebutton">
       <span  @click="popoutNewTask(false)" class="material-symbols-outlined" id="add">add</span>
     </div>
     <div id="newTaskHidden" class="hidden newTaskButton">
-      <input type="text" id="title" placeholder="Title"><br>
+      <input type="text" id="title" placeholder="Title" maxlength="15"><br>
 
       <input type="date" id="date" @click="dateUpdate(1)"><br>
       <input type="checkbox" id="isRepeating" 
@@ -646,7 +694,7 @@ function isToday(day) {
       </div>
       <input type="text" id="taskDescription" placeholder="Add description...">
       <label>Colour</label><input type="color" id="taskColour"><br>
-      <button @click="addToTasks(collectTaskData())">SAVE</button>
+      <button @click="checkIfLessThanTwentyEightTasksAlreadyThere()">SAVE</button>
 
     </div>
   </main>
@@ -682,6 +730,10 @@ table {
   position: absolute;
 }
 
+.taskDetails{
+  background-color: rgb(0, 0, 0);
+}
+
 
 #monthHeader {
   left: calc(50% - 30vw + 2vw); /*needs to be offset size of calander - a little*/
@@ -700,15 +752,21 @@ table {
   display: flex;
   flex-direction: column;
   flex-wrap: wrap; /*starts new line once previous is full of tasks*/
-  max-height: 6vh; /*each vw counts 1 task in row before wrap to new line*/
-  gap: 0.5vh; /*margin*/
+  max-height: 9vh; /*each 2vw counts 1 task in row before wrap to new line*/
+  gap: 0.8vh; /*margin*/
 }
 
-.taskPreview{
+#taskPreview {
   height: 1.5vh;
   width: 1.5vh;
   border-radius: 1.5vh;
-  background-color: #3a7bc8;
+}
+#taskPreviewText {
+  height: 10vh;
+  width: 6.5vw;
+  position: relative;
+  top: -1.1vh;
+  left: 1vw; 
 }
 
 .month-label {
@@ -730,7 +788,8 @@ table {
   width: 60vw;
   background-color: var(--header-colour);
   border-radius: 1vw;
-  margin: 0 auto;
+  position: fixed;
+  left: calc(50% - 30vw);
 }
 
 #headerBox {
@@ -770,6 +829,7 @@ td {
   padding-top: 0.5vh;
   transition: all 0.1s ease-out;
   border-radius: 1vw;
+  border: 1px solid var(--background-colour);
 }
 
 td:hover {
@@ -803,14 +863,38 @@ td:hover {
   left: 1vw;
 }
 
-.SettingsColor {
-  width: 1vw;
-  height: 1vw;
+.settingslabels {
+  margin: 2vh;
+}
+
+.settingsColor {
+  width: 2vw;
+  height: 2vw;
   border: none;
   background: none;
   cursor: pointer;
-  margin-left: 0vw;
-  vertical-align: middle;
+  position: absolute;
+  right: 8vw;
+}
+
+#profilePhoto {
+  position: fixed;
+  right: 1vw;
+  top: 0vw;
+  object-fit: cover;
+  transform: scale(0.1);
+  justify-content: right;
+  width: 8vw;
+  height: 5vh;
+}
+
+#profilePhotoPhoto {
+  border-radius: 50%;
+}
+
+#profilePhotoPhoto:hover {
+  box-shadow: 1vw 1vw 1vw 0.5vw black;
+  cursor: pointer;
 }
 
 #newTaskHidden {
@@ -821,6 +905,13 @@ td:hover {
   padding: 1vw;
   background: transparent;
 }
+
+#taskViewColor {
+  width: 1.5vw;
+  height: 1.5vw;
+  background: none;
+
+} 
 
 /* Input field styling */
 #newTaskHidden input[type="text"],
@@ -838,7 +929,7 @@ td:hover {
 #newTaskHidden input[type="date"]:focus,
 #newTaskHidden input[type="number"]:focus,
 #newTaskHidden select:focus {
-  border-color: #4a90e2;
+
   outline: none;
 }
 
@@ -850,7 +941,6 @@ td:hover {
 #newTaskHidden input[type="checkbox"] {
   margin-right: 0.5vw;
   margin-left: 0.5vw;
-  accent-color: #4a90e2;
 }
 
 /* Label styling */
@@ -902,10 +992,6 @@ td:hover {
   transition: background-color 0.3s;
 }
 
-#newTaskHidden button:hover {
-  background-color: #3a7bc8;
-}
-
 /* Responsive adjustments */
 @media (max-width: 400px) {
   #newTaskHidden {
@@ -920,6 +1006,15 @@ td:hover {
   transform: translateY(-50%);
   border-top-right-radius: 1vw;
   border-bottom-right-radius: 1vw;
+}
+
+#taskViewHidden {
+  position: fixed;
+  height: 75vh;
+  width: 34vh;
+  right: -100vw;
+  padding: 1vw;
+  background: transparent;
 }
 
 .newTaskButton {

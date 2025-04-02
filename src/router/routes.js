@@ -1,17 +1,25 @@
 import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getFunctions, httpsCallable} from "firebase/functions"
 import app from "../api/firebase";
 
-function isAuth(to, from, next) {
+async function isAuth(to, from, next) {
     console.log("Checking auth");
     const auth = getAuth(app);
+    const func = getFunctions(app)
+    const secureFunc = httpsCallable(func, "secureFunction")
+    const res = await (await secureFunc()).data
 
-        if (auth) {
+    onAuthStateChanged(auth, ()=>{
+        if (res) {
             console.log("User is authenticated:");
             next(); 
+            return
         } else {
             console.log("User is not authenticated, redirecting to login.");
             next({ path: "/Login" });
+            return
         }
+    })    
 }
 
 function loadPage(component) {

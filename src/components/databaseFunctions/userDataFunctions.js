@@ -31,7 +31,7 @@ export async function removeFromEvents(event){
 }
 
 export async function addToTasks(event){
-    console.log(event)
+    //console.log(event)
     try {
         await updateDoc(getUserDoc(), {tasks: arrayUnion(event)})
     } catch (error) {
@@ -44,6 +44,17 @@ export async function removeFromTasks(event){
         await updateDoc(getUserDoc(), {tasks: arrayRemove(event)}) 
     } catch (error) {
         console.error("Something went wrong:", error)
+    }
+}
+
+export async function updateTaskColour(task){
+    try{
+        const data = await getUserData()
+        let tasksList = data.tasks
+        tasksList.find(t=>t.id == task.id).taskColour = task.taskColour
+        await updateDoc(getUserDoc(), {tasks: tasksList})
+    }catch(e){
+        console.error(e)
     }
 }
 
