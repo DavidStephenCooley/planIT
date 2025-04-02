@@ -36,10 +36,10 @@ let tasks = []
 let tasksDict = []
 
 function getTasksForDate(day, isCurrentMonth){
-  let ind = currentYear.value + "-" + (currentMonth.value<10?"0":"")+(currentMonth.value+1) + "-" + (day<10?"0":"") + day
-  if(isCurrentMonth)
+  const month = (!isCurrentMonth)?((day > 15)? currentMonth.value-1 : currentMonth.value+1):(currentMonth.value)
+
+  let ind = currentYear.value + "-" + (month<10?"0":"")+(month+1) + "-" + (day<10?"0":"") + day
   return tasksDict[ind]
-  return null
 }
 
 async function refreshTaskPreviews() {
