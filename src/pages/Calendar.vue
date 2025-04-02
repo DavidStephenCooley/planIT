@@ -628,7 +628,7 @@ function isToday(day) {
     </div>
 
     <div id="profilePhoto" class="image">
-      <img id="profilePhotoPhoto" src="../assets/profiletest.jpg">
+      <img id="profilePhotoPhoto" src="../assets/profiletest.png">
     </div>
 
 
@@ -813,6 +813,7 @@ td {
   padding-top: 0.5vh;
   transition: all 0.1s ease-out;
   border-radius: 1vw;
+  border: 1px solid var(--background-colour);
 }
 
 td:hover {
