@@ -447,6 +447,15 @@ function isToday(day) {
   }
   }
 
+  function checkIfLessThanTwentyEightTasksAlreadyThere() {
+    const elem = document.getElementById("date").value;
+    console.log(elem);
+    if (tasksDict[elem] == undefined || tasksDict[elem].length < 16) {
+      addToTasks(collectTaskData())
+    } else {
+      alert("You already have 16 tasks on this day.");
+    }
+  }
 
 </script>
 
@@ -481,7 +490,11 @@ function isToday(day) {
                 >
                 {{ day.day }}
                 <div class="taskPreviewContainer">
-                  <div class="taskPreview" v-if="dataLoaded" v-for="box in getTasksForDate(day.day, day.isCurrentMonth)" :key="dataLoaded" :style="{backgroundColor:box.taskColour}"> {{ box.title }} </div>
+                  <div id="taskPreview" v-if="dataLoaded" v-for="(box,index) in getTasksForDate(day.day, day.isCurrentMonth)" :key="dataLoaded" :style="{backgroundColor:box.taskColour}"> 
+                    <div id="taskPreviewText" >
+                    {{ (getTasksForDate(day.day, day.isCurrentMonth).length < 5)?(box.title):("") }}
+                    </div>
+                  </div>
                 </div>
              </td>
             </tr>
@@ -592,6 +605,10 @@ function isToday(day) {
 
     </div>
 
+    <div id="profilePhoto" class="image">
+      <img id="profilePhotoPhoto" src="../assets/profiletest.jpg">
+    </div>
+
 
     <div id="taskViewButton" class="taskViewButton sidebutton">
       <span @click="popoutViewTask(false)" class="material-symbols-outlined" id="viewTaskChevron">arrow_forward_ios</span>
@@ -612,7 +629,7 @@ function isToday(day) {
       <span  @click="popoutNewTask(false)" class="material-symbols-outlined" id="add">add</span>
     </div>
     <div id="newTaskHidden" class="hidden newTaskButton">
-      <input type="text" id="title" placeholder="Title"><br>
+      <input type="text" id="title" placeholder="Title" maxlength="15"><br>
 
       <input type="date" id="date" @click="dateUpdate(1)"><br>
       <input type="checkbox" id="isRepeating" 
@@ -633,7 +650,7 @@ function isToday(day) {
       </div>
       <input type="text" id="taskDescription" placeholder="Add description...">
       <label>Colour</label><input type="color" id="taskColour"><br>
-      <button @click="addToTasks(collectTaskData())">SAVE</button>
+      <button @click="checkIfLessThanTwentyEightTasksAlreadyThere()">SAVE</button>
 
     </div>
   </main>
@@ -687,15 +704,21 @@ table {
   display: flex;
   flex-direction: column;
   flex-wrap: wrap; /*starts new line once previous is full of tasks*/
-  max-height: 6vh; /*each vw counts 1 task in row before wrap to new line*/
-  gap: 0.5vh; /*margin*/
+  max-height: 9vh; /*each 2vw counts 1 task in row before wrap to new line*/
+  gap: 0.8vh; /*margin*/
 }
 
-.taskPreview{
+#taskPreview {
   height: 1.5vh;
   width: 1.5vh;
   border-radius: 1.5vh;
-  background-color: #3a7bc8;
+}
+#taskPreviewText {
+  height: 10vh;
+  width: 6.5vw;
+  position: relative;
+  top: -1.1vh;
+  left: 1vw; 
 }
 
 .month-label {
@@ -717,7 +740,8 @@ table {
   width: 60vw;
   background-color: var(--header-colour);
   border-radius: 1vw;
-  margin: 0 auto;
+  position: fixed;
+  left: calc(50% - 30vw);
 }
 
 #headerBox {
@@ -804,6 +828,26 @@ td:hover {
   right: 8vw;
 }
 
+#profilePhoto {
+  position: fixed;
+  right: 1vw;
+  top: 0vw;
+  object-fit: cover;
+  transform: scale(0.1);
+  justify-content: right;
+  width: 8vw;
+  height: 5vh;
+}
+
+#profilePhotoPhoto {
+  border-radius: 50%;
+}
+
+#profilePhotoPhoto:hover {
+  box-shadow: 1vw 1vw 1vw 0.5vw black;
+  cursor: pointer;
+}
+
 #newTaskHidden {
   position: fixed;
   height: 75vh;
@@ -814,8 +858,6 @@ td:hover {
 }
 
 #taskViewColor {
-  -webkit-appearance: none; /* Reset default styles */
-  -moz-appearance: none;
   width: 1.5vw;
   height: 1.5vw;
   background: none;
