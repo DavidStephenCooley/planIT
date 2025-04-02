@@ -47,12 +47,12 @@ export async function removeFromTasks(event){
     }
 }
 
-export async function updateTask(task){
+export async function updateTaskColour(task){
     try{
-        console.log("updating doc",task.id)
-        let upd = {}
-        upd[`tasks.${task.id}`] = task
-        await updateDoc(getUserDoc(), task)
+        const data = await getUserData()
+        let tasksList = data.tasks
+        tasksList.find(t=>t.id == task.id).taskColour = task.taskColour
+        await updateDoc(getUserDoc(), {tasks: tasksList})
     }catch(e){
         console.error(e)
     }

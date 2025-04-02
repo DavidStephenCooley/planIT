@@ -3,7 +3,7 @@ import { ref, onMounted, watch, onBeforeUpdate } from 'vue';
 import { getAuth, signOut } from 'firebase/auth';
 import { useRouter } from 'vue-router';
 import '@/assets/global.css'
-import { updateSetting, getUserData, addToTasks, setAllSettings, updateTask } from "../components/databaseFunctions/userDataFunctions"
+import { updateSetting, getUserData, addToTasks, setAllSettings, updateTaskColour, removeFromTasks } from "../components/databaseFunctions/userDataFunctions"
 import app from '@/api/firebase';
 
 const router = useRouter()
@@ -637,13 +637,17 @@ function isToday(day) {
     </div>
     
     <!--  THIS WILL NEED TO BE A COMPONENT OR SOMETHING BECAUSE IT NEEDS TO BE REPEATED FOR EACH TASK ON A GIVEN DAY  -->
-    <div id="taskViewHidden" class="hidden taskViewButton" >
+    <div id="taskViewHidden" class="hidden taskViewButton">
       <div class="taskDetails" v-for="task in currentDayTasks">
         <span id="taskViewTitle">Today</span>
         <div id="taskViewTheThingThatRepeats">
-          <input type="color" id="taskViewColor" v-model="task.taskColour" @input="updateTask(task)">
+          <input type="color" id="taskViewColor" v-model="task.taskColour" @input="updateTaskColour(task)">
           <span id="taskViewName">{{task.title}}</span>
           <textarea type="text" id="taskViewDescription" v-model="task.description"></textarea>
+          <button @click="tasksDict[task.date] = tasksDict[task.date].filter(t=>t.id!=task.id);
+                            currentDayTasks = currentDayTasks.filter(t=>t!=task)
+                           removeFromTasks(task);
+                           refreshTaskPreviews();">Delete type shi</button>
         </div>
       </div>
     </div>
