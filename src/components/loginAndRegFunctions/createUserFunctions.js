@@ -1,6 +1,6 @@
 import { getFirestore, setDoc, collection, getDoc, doc, updateDoc, arrayUnion, arrayRemove, query, where} from "firebase/firestore";
 import app from "@/api/firebase";
-import { getAuth, signOut } from "firebase/auth"
+import { getAuth, signOut, deleteUser } from "firebase/auth"
 
 const db = getFirestore(app,"database1")
 
@@ -17,5 +17,28 @@ export async function addUser(inpEmail, inpData){
         console.log("added user to database")
         await setDoc(doc(collection(db, "users"), `${inpEmail}`), inpData)
     }    
+}
+
+export async function deleteUserProfile(){
+    if(comfirm("Are you sure?")){
+        txt = "Deleteing"
+    
+    const auth = getAuth();
+    const user = auth.currentUser 
+        
+    if(user){
+        txt = "Deleteing"
+        deleteUser(user)
+        .then(() => {
+            console.log("User account deleted successfully.");
+          })
+          .catch((error) => {
+            console.error("Error deleting user:", error);
+          });
+      } else {
+        txt = "Cancelling"
+        console.log("No user is currently signed in.");
+    }
+    }
 }
 

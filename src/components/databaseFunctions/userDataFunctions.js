@@ -66,28 +66,7 @@ export async function setAllSettings(sett){
     }
 }
 
-export async function deleteUser(){
-    if(comfirm("Are you sure?")){
-        txt = "Deleteing"
-    
-    const auth = getAuth();
-    const user = auth.currentUser 
-        
-    if(user){
-        txt = "Deleteing"
-        deleteUser(user)
-        .then(() => {
-            console.log("User account deleted successfully.");
-          })
-          .catch((error) => {
-            console.error("Error deleting user:", error);
-          });
-      } else {
-        txt = "Cancelling"
-        console.log("No user is currently signed in.");
-    }
-    }
-}
+
 
 /*   if(comfirm("Are you sure?")){
         txt = "Deleteing"

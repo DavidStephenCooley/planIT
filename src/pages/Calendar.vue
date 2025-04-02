@@ -3,7 +3,8 @@ import { ref, onMounted, watch, onBeforeUpdate } from 'vue';
 import { getAuth, signOut } from 'firebase/auth';
 import { useRouter } from 'vue-router';
 import '@/assets/global.css';
-import { updateSetting, getUserData, addToTasks, setAllSettings, deleteUser } from "../components/databaseFunctions/userDataFunctions";
+import { updateSetting, getUserData, addToTasks, setAllSettings } from "../components/databaseFunctions/userDataFunctions";
+import { deleteUserProfile } from "../components/loginAndRegFunctions/createUserFunctions"
 import app from '@/api/firebase';
 
 const router = useRouter();
@@ -607,7 +608,7 @@ function isToday(day) {
     </button>
 
     <button
-       @click="() => { signOutUser(router); deleteUser(email.value); }"
+       @click="() => {deleteUserProfile();}"
       style="
       width: 2vw;
       height: 4.5vh;">
