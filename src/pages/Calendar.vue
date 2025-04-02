@@ -6,6 +6,7 @@ import { deleteUserProfile } from "../components/loginAndRegFunctions/createUser
 import '@/assets/global.css'
 import { updateSetting, getUserData, addToTasks, setAllSettings, updateTaskColour, removeFromTasks } from "../components/databaseFunctions/userDataFunctions"
 import app from '@/api/firebase';
+import { deleteField } from 'firebase/firestore';
 
 const router = useRouter();
 const user = getAuth();
@@ -21,6 +22,7 @@ let foreverCheck = true;
 let viewTaskOpen = false;
 let newTaskOpen = false;
 let settingsOpen = false;
+let profileOpen = false;
 let selectDate = 0;
 
 let backgroundColour;
@@ -470,6 +472,40 @@ function isToday(day) {
     }
   }
 
+  function popoutProfile() {
+    profileOpen = !profileOpen;
+    let button = document.getElementById("profilePhotoHidden");
+    let buttons = document.getElementsByClassName("profileButtons");
+    if (profileOpen) {
+      button.style.width = "15vw";
+      button.style.height = "9vh";
+      button.style.opacity = "100%";
+      for (let i = 0; i < buttons.length; i++) {
+          buttons[i].style.pointerEvents = "all";
+          buttons[i].style.cursor = "pointer";
+          buttons[i].style.width = "3vw";
+          buttons[i].style.height = "5vh";
+      setTimeout(() => {     
+        for (let i = 0; i < buttons.length; i++) {
+          buttons[i].style.opacity = "100%"
+        }
+      }, 100);
+    }
+   } else {
+      
+      button.style.width = "7vh";
+      button.style.height = "7vh";
+      button.style.opacity = "0%";
+      for (let i = 0; i < buttons.length; i++) {
+        buttons[i].style.userSelect = "none";
+        buttons[i].style.pointerEvents = "none";
+        buttons[i].style.width = "1vw";
+        buttons[i].style.height = "1vh";
+        buttons[i].style.opacity = "0%"
+      }
+    }
+  }
+
   function repeatingClick() {
     const text = document.getElementById("repeatingText")
     if(repeatingCheck == false) {
@@ -512,6 +548,10 @@ function isToday(day) {
     } else {
       alert("You already have 16 tasks on this day.");
     }
+  }
+
+  function clicktest() {
+    console.log("click");
   }
 
 </script>
@@ -656,11 +696,6 @@ function isToday(day) {
       
     > <br>
     <button @click="resetToDefaultColours()">Reset to Default</button>
-    
-    <button
-      @click="signOutUser(router)">
-      Sign Out
-    </button>
 
     <button
        @click="() => {signOutUser(router); deleteUserProfile();}"
@@ -671,8 +706,12 @@ function isToday(day) {
     </button>
 
     </div>
-
-    <div id="profilePhoto" class="image">
+    <div id="profilePhotoHidden" class="hidden">
+      <button class="profileButtons">Change<br>PFP</button>
+      <button class="profileButtons" @click="signOutUser(router)">Sign<br>Out</button>
+      <button class="profileButtons" @click=clicktest()>Delete<br>User</button>
+    </div>
+    <div id="profilePhoto" class="image" @click="popoutProfile()">
       <img id="profilePhotoPhoto" src="../assets/profiletest.png">
     </div>
 
@@ -682,17 +721,17 @@ function isToday(day) {
     </div>
     
     <!--  THIS WILL NEED TO BE A COMPONENT OR SOMETHING BECAUSE IT NEEDS TO BE REPEATED FOR EACH TASK ON A GIVEN DAY  -->
-    <div id="taskViewHidden" class="hidden taskViewButton">
-      <div class="taskDetails" v-for="task in currentDayTasks">
-        <span id="taskViewTitle">Today</span>
+    <div id="taskViewHidden" class="hidden taskViewButton" style="background-color: transparent;">
+      <span id="taskViewTitle" style="background-color: transparent;">Today</span>
+      <div style="background-color: transparent;" class="taskDetails" v-for="task in currentDayTasks">
         <div id="taskViewTheThingThatRepeats">
           <input type="color" id="taskViewColor" v-model="task.taskColour" @input="updateTaskColour(task)">
           <span id="taskViewName">{{task.title}}</span>
           <textarea type="text" id="taskViewDescription" v-model="task.description"></textarea>
-          <button @click="tasksDict[task.date] = tasksDict[task.date].filter(t=>t.id!=task.id);
+          <button id="taskViewDeleteButton" @click="tasksDict[task.date] = tasksDict[task.date].filter(t=>t.id!=task.id);
                             currentDayTasks = currentDayTasks.filter(t=>t!=task)
                            removeFromTasks(task);
-                           refreshTaskPreviews();">Delete type shi</button>
+                           refreshTaskPreviews();">Delete</button>
         </div>
       </div>
     </div>
@@ -794,7 +833,7 @@ table {
   height: 10vh;
   width: 6.5vw;
   position: relative;
-  top: -1.1vh;
+  top: -50%;
   left: 1vw; 
 }
 
@@ -830,7 +869,6 @@ table {
 }
 
 #calenderBox {
-  height: calc(75vh - 6vh);
   width: 60vw;
   background-color: var(--calendar-colour);
   top: 10vh;
@@ -906,23 +944,59 @@ td:hover {
   right: 8vw;
 }
 
+#profilePhotoHidden {
+  position: fixed;
+  height: 7vh;
+  width: 3.4vw;
+  top: 2.2vh;
+  right: 2vw;
+  border-radius: 5vh;
+  background-color: var(--chevroned-colour);
+  transition: 0.1s ease-in-out;
+  opacity: 0%;
+}
+
+.profileButtons {
+  user-select: none;
+  pointer-events: none;
+  position:relative;
+  top: calc(50% - 3.5vh);
+  left: 1vw;
+  padding: 0.1vw;
+  margin-left: 0.25vw;
+  margin-top: 1vh;
+  background-color: white;
+  color: rgb(133, 13, 13);
+  border: 2px solid rgb(100, 24, 24);
+  border-radius: 0.5vw;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-size: 0.75rem;
+}
+
+.profileButtons:hover {
+  color: white;
+  background-color: rgb(100, 24, 24);
+  transform: scale(1.1);
+}
+
+
 #profilePhoto {
   position: fixed;
-  right: 1vw;
-  top: 0vw;
+  right: 2vw;
+  top: 1.3vw;
   object-fit: cover;
-  transform: scale(0.1);
   justify-content: right;
-  width: 8vw;
-  height: 5vh;
 }
 
 #profilePhotoPhoto {
   border-radius: 50%;
+  width: 4vw;
+  height: 8vh;
 }
 
 #profilePhotoPhoto:hover {
-  box-shadow: 1vw 1vw 1vw 0.5vw black;
+  box-shadow: 0.25vw 0.25vw 1vw black;
   cursor: pointer;
 }
 
@@ -934,13 +1008,6 @@ td:hover {
   padding: 1vw;
   background: transparent;
 }
-
-#taskViewColor {
-  width: 1.5vw;
-  height: 1.5vw;
-  background: none;
-
-} 
 
 /* Input field styling */
 #newTaskHidden input[type="text"],
@@ -958,7 +1025,7 @@ td:hover {
 #newTaskHidden input[type="date"]:focus,
 #newTaskHidden input[type="number"]:focus,
 #newTaskHidden select:focus {
-
+  
   outline: none;
 }
 
@@ -1018,7 +1085,7 @@ td:hover {
   font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: background-color 0.2s;
 }
 
 /* Responsive adjustments */
@@ -1028,6 +1095,14 @@ td:hover {
     padding: 1vw;
   }
 }
+
+
+#taskViewColor {
+  width: 1.5vw;
+  height: 1.5vw;
+  background: none;
+  border: none;
+} 
 
 #taskViewButton {
   left: 0;
@@ -1043,7 +1118,54 @@ td:hover {
   width: 34vh;
   right: -100vw;
   padding: 1vw;
-  background: transparent;
+  background-color: transparent;
+  overflow: scroll;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: #888 transparent;
+}
+
+
+#taskDetails {
+  background-color: transparent;
+}
+
+#taskViewTheThingThatRepeats {
+  background-color: transparent;
+}
+
+#taskViewName {
+
+}
+
+#taskViewDescription {
+  width: 100%;
+  padding: 0.69vw;
+  margin: 0.5vw 0;
+  border-radius: 0.5vw;
+  font-size: 1rem;
+  font-family: sans-serif;
+}
+
+#taskViewDeleteButton {
+  width: 100%;
+  padding: 0.5vw;
+  margin-top: 0vh;
+  margin-bottom: 3vh;
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 0.5vw;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+#taskViewDeleteButton:hover {
+  color: white;
+  background-color: rgb(100, 24, 24);
+  transform: scale(1.05);
 }
 
 .newTaskButton {
