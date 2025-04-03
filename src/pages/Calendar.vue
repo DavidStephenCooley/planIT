@@ -403,7 +403,8 @@ function isToday(day) {
       until: document.getElementById("until").value,
       dateUntil: document.getElementById("dateUntil").value || null,
       taskColour: document.getElementById("taskColour").value,
-      description: document.getElementById("taskDescription").value || null
+      description: document.getElementById("taskDescription").value || null,
+      //taskCompleted: 
     }
 
     const thing = document.getElementById("date").value
@@ -567,6 +568,17 @@ function isToday(day) {
       addToTasks(collectTaskData())
     } else {
       alert("You already have 16 tasks on this day.");
+    }
+  }
+
+  function markTaskAsComplete(task) {
+    const taskCSS = document.getElementById("taskViewName");
+    taskCompleted = !taskCompleted;
+    updateTaskColour()
+    if (taskCompleted) {
+      taskCSS.style.textDecoration = "line-through";
+    } else {
+      taskCSS.style.textDecoration = "none";
     }
   }
 
@@ -737,9 +749,15 @@ function isToday(day) {
       <span id="taskViewTitle" style="background-color: transparent;">Today</span>
       <div style="background-color: transparent;" class="taskDetails" v-for="task in currentDayTasks">
         <div id="taskViewTheThingThatRepeats">
+<<<<<<< HEAD
           <input type="color" id="taskViewColor" v-model="task.taskColour" @focusout="updateTaskColour(task)">
           <span id="taskViewName">{{task.title}}</span>
           <textarea type="text" id="taskViewDescription" v-model="task.description" @focusout="updateTaskColour(task)"></textarea>
+=======
+          <input type="color" id="taskViewColor" v-model="task.taskColour" @input="updateTaskColour(task)">
+          <span id="taskViewName" @click="markTaskAsComplete(task)">{{task.title}}</span>
+          <textarea type="text" id="taskViewDescription" v-model="task.description"></textarea>
+>>>>>>> 32505c8 (started implementing a complete task thing)
           <button id="taskViewDeleteButton" @click="tasksDict[task.date] = tasksDict[task.date].filter(t=>t.id!=task.id);
                             currentDayTasks = currentDayTasks.filter(t=>t!=task)
                            removeFromTasks(task);
@@ -1146,8 +1164,9 @@ td:hover {
   background-color: transparent;
 }
 
-#taskViewName {
-
+#taskViewName:hover {
+  cursor: pointer;
+  font-weight: 600;
 }
 
 #taskViewDescription {
