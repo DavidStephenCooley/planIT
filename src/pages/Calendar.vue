@@ -552,11 +552,15 @@ function isToday(day) {
       until.checked = true
       foreverCheck = false;
       untilText.style.opacity = "100%"
+      untilText.style.pointerEvents = "all"
+      untilText.style.userSelect = "all"
     }
     else {
       forever.checked = true
       until.checked = false
       foreverCheck = true;
+      untilText.pointerEvents = "none"
+      untilText.style.userSelect=  "none"
       untilText.style.opacity = "60%"
   }
   }
