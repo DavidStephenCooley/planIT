@@ -266,8 +266,9 @@ function isToday(day) {
     await getUserData()
     .then((data)=>{
       console.log(data)
-      if(!data.settings){
+      if(!data){
         resetToDefaultColours()
+        reloadPFP()
       }
       const sett = data.settings
 
@@ -583,16 +584,15 @@ function isToday(day) {
   function markTaskAsComplete(task) {
     task.taskCompleted = !task.taskCompleted;
     updateTaskColour(task)
-    reloadComplete(task)
+    //reloadComplete(task, this)
     console.log(task)
   }
 
-  function reloadComplete(task){
-    const taskCSS = document.getElementById("taskViewName");
+  function reloadComplete(task, thing){
     if (task.taskCompleted) {
-      taskCSS.style.textDecoration = "line-through";
+      thing.style.textDecoration = "line-through";
     } else {
-      taskCSS.style.textDecoration = "none";
+      thing.style.textDecoration = "none";
     }
   }
 
@@ -765,7 +765,7 @@ function isToday(day) {
       <div style="background-color: transparent;" class="taskDetails" v-for="task in currentDayTasks">
         <div id="taskViewTheThingThatRepeats">
           <input type="color" id="taskViewColor" v-model="task.taskColour" @focusout="updateTaskColour(task)">
-          <span id="taskViewName" @click="markTaskAsComplete(task)">{{task.title}}</span>
+          <span id="taskViewName" @click="markTaskAsComplete(task)" :style="{'text-Decoration': task.taskCompleted?'line-through':'none'}">{{task.title}}</span>
           <textarea type="text" id="taskViewDescription" v-model="task.description" @focusout="updateTaskColour(task)"></textarea>
           <button id="taskViewDeleteButton" @click="tasksDict[task.date] = tasksDict[task.date].filter(t=>t.id!=task.id);
             currentDayTasks = currentDayTasks.filter(t=>t!=task)
