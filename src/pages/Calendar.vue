@@ -635,7 +635,7 @@ function isToday(day) {
                 <div class="taskPreviewContainer">
 
                   <div id="taskPreview" v-if="dataLoaded" v-for="(box,index) in getTasksForDate(day)" :key="dataLoaded" :style="{backgroundColor:box.taskColour}"> 
-                    <div id="taskPreviewText" >
+                    <div id="taskPreviewText" :style="{'text-decoration': box.taskCompleted?'line-through':'none'}">
                     {{ (getTasksForDate(day).length < 5)?(box.title):("") }}
                     </div>
                   </div>
