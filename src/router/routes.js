@@ -11,7 +11,7 @@ async function isAuth(to, from, next) {
 
     onAuthStateChanged(auth, ()=>{
         if (res) {
-            console.log("User is authenticated:");
+            console.log("User is authenticated:", auth.currentUser);
             next(); 
             return
         } else {

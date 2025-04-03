@@ -37,7 +37,7 @@ function register(){
     .then((userCredential) => {
       // Signed in 
       const user = userCredential.user;
-      updateProfile(user, {displayName: username.value, photoURL: "https://cdn.usdairy.com/optimize/getmedia/b5108b6f-59c3-4cc4-b1d5-4b9b0d1e0c54/swiss.jpg.jpg.aspx?format=webp"})
+      updateProfile(user, {displayName: username.value, photoURL: "src/assets/profiletest.png"})
       router.push({path:"/secure"}) 
       //                                                            Profile picture for now ^
       

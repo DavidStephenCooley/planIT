@@ -4,7 +4,7 @@ import { getAuth, signOut, deleteUser } from "firebase/auth"
 
 const db = getFirestore(app,"database1")
 
-function getUser(){
+export function getUser(){
     return getAuth(app).currentUser
 }
 
@@ -20,7 +20,6 @@ export async function addUser(inpEmail, inpData){
 }
 
 export async function deleteUserProfile(){
-    if(confirm("Are you sure?")){
     
     const auth = getAuth();
     const user = auth.currentUser 
@@ -36,6 +35,5 @@ export async function deleteUserProfile(){
             });
     }
     
-    }
 }
 

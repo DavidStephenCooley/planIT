@@ -4,12 +4,21 @@ import { getAuth, signOut } from 'firebase/auth';
 import { useRouter } from 'vue-router';
 import { deleteUserProfile } from "../components/loginAndRegFunctions/createUserFunctions"
 import '@/assets/global.css'
-import { updateSetting, getUserData, addToTasks, setAllSettings, updateTaskColour, removeFromTasks } from "../components/databaseFunctions/userDataFunctions"
+import { updateSetting, getUserData, addToTasks, setAllSettings, updateTaskColour, removeFromTasks, uploadProfilePic } from "../components/databaseFunctions/userDataFunctions"
 import app from '@/api/firebase';
 import { deleteField } from 'firebase/firestore';
 
 const router = useRouter();
-const user = getAuth();
+const profilePic = ref("")
+reloadPFP()
+
+async function uploadPFP(el){
+    profilePic.value = await uploadProfilePic(el)
+}
+
+function reloadPFP(){
+  profilePic.value = getAuth(app).currentUser.photoURL
+}
 
 const today = new Date();
 const currentMonth = ref(today.getMonth());
@@ -67,6 +76,10 @@ function getTasksForDate(day){
           if(!b.isRepeating)continue //skip non repeating
           const d1 = new Date(ind)
           const d2 = new Date(key)
+          if(d1 < d2)continue
+          const d3 = new Date(b.dateUntil)
+          if(!b.forever && d2 > d3)continue
+
           const diff = (d2 - d1)/ 86400000
           //console.log(t)
           //console.log(Math.abs(diff % 2) == 0 )
@@ -87,7 +100,7 @@ function getTasksForDate(day){
           
         }
       }
-      console.log(ind, out)
+      //console.log(ind, out)
       return out
 
 }
@@ -367,6 +380,13 @@ function isToday(day) {
 
   }
 
+  function deleteButton(){
+    if(window.confirm('Are you sure?')){
+      signOutUser();
+      deleteUserProfile();
+    }
+  }
+
   function generateRandomID(){
     return Math.random().toString(32).substring(2)
   }
@@ -379,7 +399,7 @@ function isToday(day) {
       isRepeating: repeatingCheck,
       repeatType: document.getElementById("repeatType").value,
       repeatNumber: parseInt(document.getElementById("repeatNumber").value) || null,
-      forever: document.getElementById("forever").value,
+      forever: foreverCheck,
       until: document.getElementById("until").value,
       dateUntil: document.getElementById("dateUntil").value || null,
       taskColour: document.getElementById("taskColour").value,
@@ -697,22 +717,14 @@ function isToday(day) {
     > <br>
     <button @click="resetToDefaultColours()">Reset to Default</button>
 
-    <button
-       @click="() => {signOutUser(router); deleteUserProfile();}"
-      style="
-      width: 2vw;
-      height: 4.5vh;">
-      Delete User
-    </button>
-
     </div>
     <div id="profilePhotoHidden" class="hidden">
-      <button class="profileButtons">Change<br>PFP</button>
-      <button class="profileButtons" @click="signOutUser(router)">Sign<br>Out</button>
-      <button class="profileButtons" @click=clicktest()>Delete<br>User</button>
+      <input class="profileButtons" type="file" @change="uploadPFP(this);" ref="pfp">Change<br>PFP</input>
+      <button class="profileButtons" @click="signOutUser()">Sign<br>Out</button>
+      <button class="profileButtons" @click="deleteButton()">Delete<br>User</button>
     </div>
     <div id="profilePhoto" class="image" @click="popoutProfile()">
-      <img id="profilePhotoPhoto" src="../assets/profiletest.png">
+      <img id="profilePhotoPhoto" :src="profilePic" @click="console.log(profilePic)">
     </div>
 
 
@@ -725,9 +737,9 @@ function isToday(day) {
       <span id="taskViewTitle" style="background-color: transparent;">Today</span>
       <div style="background-color: transparent;" class="taskDetails" v-for="task in currentDayTasks">
         <div id="taskViewTheThingThatRepeats">
-          <input type="color" id="taskViewColor" v-model="task.taskColour" @input="updateTaskColour(task)">
+          <input type="color" id="taskViewColor" v-model="task.taskColour" @focusout="updateTaskColour(task)">
           <span id="taskViewName">{{task.title}}</span>
-          <textarea type="text" id="taskViewDescription" v-model="task.description"></textarea>
+          <textarea type="text" id="taskViewDescription" v-model="task.description" @focusout="updateTaskColour(task)"></textarea>
           <button id="taskViewDeleteButton" @click="tasksDict[task.date] = tasksDict[task.date].filter(t=>t.id!=task.id);
                             currentDayTasks = currentDayTasks.filter(t=>t!=task)
                            removeFromTasks(task);
@@ -1223,5 +1235,9 @@ td:hover {
   'wght' 400,
   'GRAD' 0,
   'opsz' 24
+}
+
+textarea{
+  resize: none;
 }
 </style>

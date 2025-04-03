@@ -1,5 +1,8 @@
 import { getFirestore, setDoc, collection, getDoc, doc, updateDoc, arrayUnion, arrayRemove, query, where, deleteDoc} from "firebase/firestore";
-import { getUserDoc } from "../loginAndRegFunctions/createUserFunctions"
+import { getUserDoc, getUser } from "../loginAndRegFunctions/createUserFunctions"
+import { updateProfile } from "firebase/auth"
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage"
+import app from "@/api/firebase";
 
 export async function getUserData(){
     try {
@@ -48,10 +51,13 @@ export async function removeFromTasks(event){
 }
 
 export async function updateTaskColour(task){
+    console.log("hi")
     try{
         const data = await getUserData()
         let tasksList = data.tasks
-        tasksList.find(t=>t.id == task.id).taskColour = task.taskColour
+        const corresponding = tasksList.find(t=>t.id == task.id)
+        corresponding.taskColour = task.taskColour
+        corresponding.description = task.description
         await updateDoc(getUserDoc(), {tasks: tasksList})
     }catch(e){
         console.error(e)
@@ -75,6 +81,18 @@ export async function setAllSettings(sett){
     } catch (error) {
         console.error("Something went wrong:", error)
     }
+}
+
+const storage = getStorage(app)
+
+export async function uploadProfilePic(element){
+        // Creates a folder images (if it doesn't already exist)
+    const storageRef = ref(storage, 'images/' + element.$refs.pfp.value);
+        // Uploads to the the storage bucket
+    const snap = await uploadBytes(storageRef, element.$refs.pfp.files[0])
+    const url = await getDownloadURL(snap.ref)
+    updateProfile(getUser(), {photoURL: url})
+    return url
 }
 
 
