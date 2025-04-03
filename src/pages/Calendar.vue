@@ -643,7 +643,7 @@ function isToday(day) {
     </div>
 
     <div id="settingsHidden" class="hidden settingsClass">
-    <label class="settingslabels" >Background:</label>
+    <label class="settingslabels" >• Background:</label>
     <input
       type="color" 
       class="settingsColor"
@@ -653,7 +653,7 @@ function isToday(day) {
       @change="updateSetting('backgroundColour', backgroundColour)"
     
     > <br>
-    <label class="settingslabels" >Calendar:</label>
+    <label class="settingslabels" >• Calendar:</label>
     <input
       type="color" 
       class="settingsColor"
@@ -663,7 +663,7 @@ function isToday(day) {
       @change="updateSetting('calendarColour', calendarColour)"
       
     > <br>
-    <label class="settingslabels" >Today:</label>
+    <label class="settingslabels" >• Today:</label>
     <input
       type="color" 
       class="settingsColor"
@@ -673,7 +673,7 @@ function isToday(day) {
       @change="updateSetting('todayColour', todayColour)"
       
     > <br>
-    <label class="settingslabels" >Chosen Day:</label>
+    <label class="settingslabels" >• Chosen Day:</label>
     <input
       type="color" 
       class="settingsColor"
@@ -683,7 +683,7 @@ function isToday(day) {
       @change="updateSetting('selectedDayColour', selectedDayColour)"
       
     > <br>
-    <label class="settingslabels" >Tabs:</label>
+    <label class="settingslabels" >• Tabs:</label>
     <input
       type="color" 
       class="settingsColor"
@@ -692,7 +692,7 @@ function isToday(day) {
       @input="updateTheme()"
       @change="updateSetting('chevronedColour', chevronedColour)"
       > <br>
-    <label class="settingslabels" >Header:</label>
+    <label class="settingslabels" >• Header:</label>
     <input
       type="color"
       class="settingsColor"
@@ -702,7 +702,7 @@ function isToday(day) {
       @change="updateSetting('headerColour', headerColour)"
       
     > <br>
-    <label class="settingslabels" >Text:</label>
+    <label class="settingslabels" >• Text:</label>
     <input
       type="color" 
       class="settingsColor"
@@ -712,7 +712,7 @@ function isToday(day) {
       @change="updateSetting('textColour', textColour)"
       
     > <br>
-    <label class="settingslabels" >Today's Text:</label>
+    <label class="settingslabels" >• Today's Text:</label>
     <input
       type="color" 
       class="settingsColor"
@@ -722,7 +722,7 @@ function isToday(day) {
       @change="updateSetting('todayTextColour', todayTextColour)"
       
     > <br>
-    <label class="settingslabels" >Extra Days:</label>
+    <label class="settingslabels" >• Extra Days:</label>
     <input
       type="color" 
       class="settingsColor"
@@ -732,7 +732,7 @@ function isToday(day) {
       @change="updateSetting('otherMonthTextColour', otherMonthTextColour)"
       
     > <br>
-    <button @click="resetToDefaultColours()">Reset to Default</button>
+    <button id="resetToDefaultButton" @click="resetToDefaultColours()">Reset to Default</button>
 
     </div>
     <div id="profilePhotoHidden" class="hidden">
@@ -963,6 +963,7 @@ td:hover {
 
 .settingslabels {
   margin: 2vh;
+  margin-left: 15%;
 }
 
 .settingsColor {
@@ -972,7 +973,30 @@ td:hover {
   background: none;
   cursor: pointer;
   position: absolute;
-  right: 8vw;
+  right: 0vw;
+  margin-right: 20%
+}
+
+#resetToDefaultButton {
+  width: 50%;
+  padding: 0.5vw;
+  margin-top: 3.75vh;
+  margin-bottom: 3vh;
+  margin-left: 25%;
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 0.5vw;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+#resetToDefaultButton:hover {
+  color: white;
+  background-color: rgb(100, 24, 24);
+  transform: scale(1.05);
 }
 
 #profilePhotoHidden {
@@ -1015,11 +1039,6 @@ button.profileButtons:hover {
   position: absolute;
   left: 7.5vw;
   top: 2vh;
-}
-
-
-#changePFPButton:hover {
-  
 }
 
 #changePFPLabel {
