@@ -613,7 +613,7 @@ function isToday(day) {
         <table id="monthVue">
           <tbody>
             <tr v-for="(week, weekIndex) in calendar" :key="weekIndex">
-              <td class="calanderDay" @click="popoutViewTask(true); addDate(day); selectDay(day)" v-on:dblclick="popoutNewTask(true)"
+              <td class="calanderDay" @click="popoutViewTask(true); addDate(day); selectDay(day)" v-on:dblclick="popoutNewTask(true); dateUpdate(1)"
                 v-for="(day, dayIndex) in week" 
                 :key="dayIndex" 
                 :class="{ 
@@ -753,19 +753,14 @@ function isToday(day) {
       <span id="taskViewTitle" style="background-color: transparent;">Today</span>
       <div style="background-color: transparent;" class="taskDetails" v-for="task in currentDayTasks">
         <div id="taskViewTheThingThatRepeats">
-<<<<<<< HEAD
           <input type="color" id="taskViewColor" v-model="task.taskColour" @focusout="updateTaskColour(task)">
-          <span id="taskViewName">{{task.title}}</span>
-          <textarea type="text" id="taskViewDescription" v-model="task.description" @focusout="updateTaskColour(task)"></textarea>
-=======
-          <input type="color" id="taskViewColor" v-model="task.taskColour" @input="updateTaskColour(task)">
           <span id="taskViewName" @click="markTaskAsComplete(task)">{{task.title}}</span>
-          <textarea type="text" id="taskViewDescription" v-model="task.description"></textarea>
->>>>>>> 32505c8 (started implementing a complete task thing)
+          <textarea type="text" id="taskViewDescription" v-model="task.description" @focusout="updateTaskColour(task)"></textarea>
           <button id="taskViewDeleteButton" @click="tasksDict[task.date] = tasksDict[task.date].filter(t=>t.id!=task.id);
-                            currentDayTasks = currentDayTasks.filter(t=>t!=task)
-                           removeFromTasks(task);
-                           refreshTaskPreviews();">Delete</button>
+            currentDayTasks = currentDayTasks.filter(t=>t!=task)
+            removeFromTasks(task);
+            refreshTaskPreviews();">Delete
+          </button>
         </div>
       </div>
     </div>
