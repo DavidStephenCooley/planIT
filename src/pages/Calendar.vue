@@ -1116,6 +1116,10 @@ button.profileButtons:hover {
   user-select: none;
 }
 
+#taskViewTitle {
+  font-size: 1.5rem;
+}
+
 /* Checkbox styling */
 #newTaskHidden input[type="checkbox"] {
   margin-right: 0.5vw;
