@@ -79,7 +79,7 @@ function getTasksForDate(day){
           if(d1 < d2)continue
           const d3 = new Date(b.dateUntil)
           console.log(b.dateUntil)
-          if(!b.forever && d2 > d3)continue
+          if(!b.forever && !(d2 < d3))continue
 
           const diff = (d2 - d1)/ 86400000
           //console.log(t)
@@ -266,6 +266,9 @@ function isToday(day) {
     await getUserData()
     .then((data)=>{
       console.log(data)
+      if(!data.settings){
+        resetToDefaultColours()
+      }
       const sett = data.settings
 
       cssVarUpdate.setProperty("--background-colour", sett.backgroundColour)
@@ -405,6 +408,7 @@ function isToday(day) {
       dateUntil: document.getElementById("dateUntil").value || null,
       taskColour: document.getElementById("taskColour").value,
       description: document.getElementById("taskDescription").value || null,
+      taskCompleted: false
       //taskCompleted: 
     }
 
@@ -577,10 +581,15 @@ function isToday(day) {
   }
 
   function markTaskAsComplete(task) {
+    task.taskCompleted = !task.taskCompleted;
+    updateTaskColour(task)
+    reloadComplete(task)
+    console.log(task)
+  }
+
+  function reloadComplete(task){
     const taskCSS = document.getElementById("taskViewName");
-    taskCompleted = !taskCompleted;
-    updateTaskColour()
-    if (taskCompleted) {
+    if (task.taskCompleted) {
       taskCSS.style.textDecoration = "line-through";
     } else {
       taskCSS.style.textDecoration = "none";
