@@ -735,7 +735,8 @@ function isToday(day) {
 
     </div>
     <div id="profilePhotoHidden" class="hidden">
-      <input class="profileButtons" type="file" @change="uploadPFP(this);" ref="pfp">Change<br>PFP</input>
+      <label id="changePFPLabel" for="changePFPButton" class="profileButtons">PFP</label>
+      <input id="changePFPButton"  style="opacity:0" type="file" @change="uploadPFP(this);" ref="pfp"></input>
       <button class="profileButtons" @click="signOutUser()">Sign<br>Out</button>
       <button class="profileButtons" @click="deleteButton()">Delete<br>User</button>
     </div>
@@ -750,7 +751,7 @@ function isToday(day) {
     
     <!--  THIS WILL NEED TO BE A COMPONENT OR SOMETHING BECAUSE IT NEEDS TO BE REPEATED FOR EACH TASK ON A GIVEN DAY  -->
     <div id="taskViewHidden" class="hidden taskViewButton" style="background-color: transparent;">
-      <span id="taskViewTitle" style="background-color: transparent;">Today</span>
+      <span id="taskViewTitle" style="background-color: transparent;">{{ toStringfromDay(selectedDay) }}</span>
       <div style="background-color: transparent;" class="taskDetails" v-for="task in currentDayTasks">
         <div id="taskViewTheThingThatRepeats">
           <input type="color" id="taskViewColor" v-model="task.taskColour" @focusout="updateTaskColour(task)">
@@ -985,7 +986,7 @@ td:hover {
   opacity: 0%;
 }
 
-.profileButtons {
+button.profileButtons {
   user-select: none;
   pointer-events: none;
   position:relative;
@@ -1003,12 +1004,36 @@ td:hover {
   font-size: 0.75rem;
 }
 
-.profileButtons:hover {
+button.profileButtons:hover {
   color: white;
   background-color: rgb(100, 24, 24);
   transform: scale(1.1);
 }
 
+#changePFPButton {
+  position: absolute;
+  left: 7.5vw;
+  top: 2vh;
+}
+
+
+#changePFPButton:hover {
+  
+}
+
+#changePFPLabel {
+  position: absolute;
+  left: 7.5vw;
+  top: 2vh;
+  background-color: #4a90e2;
+  color: white;
+  border-radius: 0.5vw;
+  font-size: 0.75rem;
+  padding: 0.5vw;
+  text-align: center;
+  margin-left: 0.25vw;
+  cursor: pointer;
+}
 
 #profilePhoto {
   position: fixed;
