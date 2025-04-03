@@ -78,6 +78,7 @@ function getTasksForDate(day){
           const d2 = new Date(key)
           if(d1 < d2)continue
           const d3 = new Date(b.dateUntil)
+          console.log(b.dateUntil)
           if(!b.forever && d2 > d3)continue
 
           const diff = (d2 - d1)/ 86400000
