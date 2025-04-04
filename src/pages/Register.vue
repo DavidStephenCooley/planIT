@@ -53,7 +53,7 @@ function register(){
 
 <template>
   <div id="authBox">
-    <img src="@/assets/logo.svg" alt="Logo" class="logo">
+    <img src="@/assets/image.png" alt="Logo" class="logo">
     <h2>Registration</h2>
 
     <form @submit="validateForm">
