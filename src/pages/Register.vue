@@ -37,7 +37,7 @@ function register(){
     .then((userCredential) => {
       // Signed in 
       const user = userCredential.user;
-      updateProfile(user, {displayName: username.value, photoURL: "src/assets/profiletest.png"})
+      updateProfile(user, {displayName: username.value, photoURL: "-default-"})
       router.push({path:"/secure"}) 
       //                                                            Profile picture for now ^
       

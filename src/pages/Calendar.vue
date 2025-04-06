@@ -6,18 +6,22 @@ import { deleteUserProfile } from "../components/loginAndRegFunctions/createUser
 import '@/assets/global.css'
 import { updateSetting, getUserData, addToTasks, setAllSettings, updateTaskColour, removeFromTasks, uploadProfilePic } from "../components/databaseFunctions/userDataFunctions"
 import app from '@/api/firebase';
-import { deleteField } from 'firebase/firestore';
 
 const router = useRouter();
 const profilePic = ref("")
-reloadPFP()
+setTimeout(reloadPFP(), 100)
 
-async function uploadPFP(el){
-    profilePic.value = await uploadProfilePic(el)
+async function uploadPFP(){
+    profilePic.value = await uploadProfilePic(document.getElementById("changePFPButton"))
 }
 
 function reloadPFP(){
-  profilePic.value = getAuth(app).currentUser.photoURL
+  const url = getAuth(app).currentUser.photoURL
+    if(url == "-default-"){
+      profilePic.value = "src/assets/profiletest.png"
+    }else{
+      profilePic.value = url
+    }
 }
 
 const today = new Date();
@@ -78,18 +82,13 @@ function getTasksForDate(day){
           const d2 = new Date(key)
           if(d1 < d2)continue
           const d3 = new Date(b.dateUntil)
-          console.log(b.dateUntil)
-          if(!b.forever && !(d2 < d3))continue
+          if(!b.forever && (d3 < d1))continue //skip if after end date
 
-          const diff = (d2 - d1)/ 86400000
-          //console.log(t)
-          //console.log(Math.abs(diff % 2) == 0 )
           const mult = (b.repeatType == "days")?1:((b.repeatType == "weeks")?7:((b.repeatType == "months")?30:((b.repeatType == "years")?365:0)))
-          //console.log(mult)
 
           if(!(b.date == ind)){
             if(Math.abs(((d2 - d1) / 86400000 ) % (b.repeatNumber*mult)) == 0){
-              //console.log("out", out)
+
               if(out == undefined){
                 Object.assign(out, b)
               }else{
@@ -269,6 +268,7 @@ function isToday(day) {
       if(!data){
         resetToDefaultColours()
         reloadPFP()
+        return
       }
       const sett = data.settings
 
@@ -363,10 +363,11 @@ function isToday(day) {
       todayTextColour = "#0a0a0a"
       document.getElementById("cssVarTodayText").value = todayTextColour
 
+      if(dataLoaded){
       setAllSettings({backgroundColour: "#181818", calendarColour: "#424242", todayColour: "#adadad", selectedDayColour: "#757575", 
       chevronedColour: "#3a3a3a", headerColour: "#343434", textColour: "#b1b1b1", todayTextColour:"#0a0a0a", otherMonthTextColour:"#888888"})
-
-    updateTheme();
+      }
+      updateTheme();
   }
 
   function signOutUser(){
@@ -746,7 +747,7 @@ function isToday(day) {
     </div>
     <div id="profilePhotoHidden" class="hidden">
       <label id="changePFPLabel" for="changePFPButton" class="profileButtons">PFP</label>
-      <input id="changePFPButton"  style="opacity:0" type="file" @change="uploadPFP(this);" ref="pfp"></input>
+      <input id="changePFPButton"  style="opacity:0" type="file" @change="uploadPFP()" ref="pfp"></input>
       <button class="profileButtons" @click="signOutUser()">Sign<br>Out</button>
       <button class="profileButtons" @click="deleteButton()">Delete<br>User</button>
     </div>

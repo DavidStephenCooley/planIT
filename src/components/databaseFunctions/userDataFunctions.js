@@ -87,9 +87,9 @@ const storage = getStorage(app)
 
 export async function uploadProfilePic(element){
         // Creates a folder images (if it doesn't already exist)
-    const storageRef = ref(storage, 'images/' + element.$refs.pfp.value);
+    const storageRef = ref(storage, 'images/' + element.value);
         // Uploads to the the storage bucket
-    const snap = await uploadBytes(storageRef, element.$refs.pfp.files[0])
+    const snap = await uploadBytes(storageRef, element.files[0])
     const url = await getDownloadURL(snap.ref)
     updateProfile(getUser(), {photoURL: url})
     return url
