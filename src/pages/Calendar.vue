@@ -1207,7 +1207,7 @@ button.profileButtons:hover {
   right: -100vw;
   padding: 1vw;
   background-color: transparent;
-  overflow: scroll;
+  overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: thin;
   scrollbar-color: #888 transparent;
