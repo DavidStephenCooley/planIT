@@ -56,7 +56,7 @@ onMounted(() => { // Allows user to press enter instead of needing to press the 
 <template>
 
   <div id="authBox">
-    <img src="@/assets/logo.svg" alt="Logo" class="logo">
+    <img src="@/assets/efficienC.png" alt="Logo" class="logo">
     <h2>Login</h2>
 
     <form @submit="validateForm">

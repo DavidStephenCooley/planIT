@@ -8,19 +8,16 @@ import { updateSetting, getUserData, addToTasks, setAllSettings, updateTaskColou
 import app from '@/api/firebase';
 
 const router = useRouter();
-const profilePic = ref("")
-setTimeout(reloadPFP(), 100)
+let profilePic
 
 async function uploadPFP(){
-    profilePic.value = await uploadProfilePic(document.getElementById("changePFPButton"))
+    profilePic.src = await uploadProfilePic(document.getElementById("changePFPButton"))
 }
 
 function reloadPFP(){
   const url = getAuth(app).currentUser.photoURL
-    if(url == "-default-"){
-      profilePic.value = "src/assets/profiletest.png"
-    }else{
-      profilePic.value = url
+    if(url != "-default-"){
+      profilePic.src = url
     }
 }
 
@@ -141,6 +138,8 @@ function nextMonth() {
 
 onMounted(()=>{
   console.log("mounted")
+  profilePic = document.getElementById("profilePhotoPhoto")
+  reloadPFP()
   updateMonthLabel();
   updateCalendar();
   loadData();
@@ -752,7 +751,7 @@ function isToday(day) {
       <button class="profileButtons" @click="deleteButton()">Delete<br>User</button>
     </div>
     <div id="profilePhoto" class="image" @click="popoutProfile()">
-      <img id="profilePhotoPhoto" :src="profilePic" @click="console.log(profilePic)">
+      <img id="profilePhotoPhoto" src="../assets/profiletest.png" @click="console.log(profilePic)">
     </div>
 
 
